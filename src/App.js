@@ -55,18 +55,30 @@ function App() {
     }
   };
 
-  return (
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.code === "ArrowLeft") {
+        setPlayerX(prev => prev - 10);
+      } else if (event.code === "ArrowRight") {
+        setPlayerX(prev => prev + 10);
+      } else if (event.code === "ArrowUp") {
+        event.preventDefault(); // prevent page scrolling
+        jump();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [playerY]);
+  
+ return (
     <div className="App">
       <div className="game-board">
         <Player x={playerX} y={playerY} />
         <Platform left={0} bottom={0} width={300} />
       </div>
 
-      <div className="controls">
-        <button onClick={() => setPlayerX(playerX - 10)}>Left</button>
-        <button onClick={jump}>Jump</button>
-        <button onClick={() => setPlayerX(playerX + 10)}>Right</button>
-      </div>
+      {/* Controls handled via keyboard: ← → ␣ */}
     </div>
   );
 }
