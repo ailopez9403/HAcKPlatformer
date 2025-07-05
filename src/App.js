@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Player from "./Player";
 import Platform from "./Platform";
 import Enemy from "./Enemy";
@@ -19,6 +19,7 @@ function App() {
   const viewportWidth = 900;
   const playerWidth = 30;
   const playerHeight = 40;
+  const maxGameWidth = 2100;
 
   const [platforms] = useState([
     { left: 0, bottom: 0, width: 300 },
@@ -45,8 +46,6 @@ function App() {
   ]);
 
   const prize = { left: 2050, bottom: 540, width: 60, height: 60 };
-
-  const maxGameWidth = 2100;
 
   useEffect(() => {
     if (gameOver || hikeAccomplished) return;
@@ -146,46 +145,53 @@ function App() {
     prize.height,
   ]);
 
-  const jump = () => {
+  // Use useCallback to memoize jump and avoid stale closures + eslint warnings
+  const jump = useCallback(() => {
     if (gameOver || hikeAccomplished) return;
 
     const onPlatform = platforms.some((p) => playerY === p.bottom + 20);
     const onGround = playerY === 0;
 
     if (onGround || onPlatform) {
-      setPlayerY(playerY + 130); // Reduced jump height here
-      setCanJumpOffPlatform(true); // reset ability on ground/platform jump
+      setPlayerY(playerY + 130);
+      setCanJumpOffPlatform(true);
     } else if (canJumpOffPlatform) {
-      setPlayerY(playerY + 130); // Reduced jump height here
-      setCanJumpOffPlatform(false); // consume mid-air jump
+      setPlayerY(playerY + 130);
+      setCanJumpOffPlatform(false);
     }
-  };
+  }, [gameOver, hikeAccomplished, platforms, playerY, canJumpOffPlatform]);
 
-  const moveRight = () => {
-    if (gameOver || hikeAccomplished) return;
-    setPlayerX((prevX) => {
-      const newPlayerX = Math.min(prevX + 10, maxGameWidth);
-      if (newPlayerX > viewportWidth / 2) {
-        setScrollX(
-          Math.min(newPlayerX - viewportWidth / 2, maxGameWidth - viewportWidth)
-        );
-      } else {
-        setScrollX(0);
-      }
-      return newPlayerX;
-    });
-  };
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (gameOver || hikeAccomplished) return;
 
-  const moveLeft = () => {
-    if (gameOver || hikeAccomplished) return;
-    setPlayerX((prevX) => {
-      const newPlayerX = Math.max(prevX - 10, 0);
-      if (newPlayerX < viewportWidth / 2) {
-        setScrollX(Math.max(newPlayerX - viewportWidth / 2, 0));
+      if (event.code === "ArrowLeft") {
+        setPlayerX((prevX) => {
+          const newX = Math.max(prevX - 10, 0);
+          setScrollX((s) =>
+            newX < viewportWidth / 2 ? Math.max(newX - viewportWidth / 2, 0) : s
+          );
+          return newX;
+        });
+      } else if (event.code === "ArrowRight") {
+        setPlayerX((prevX) => {
+          const newX = Math.min(prevX + 10, maxGameWidth);
+          setScrollX((s) =>
+            newX > viewportWidth / 2
+              ? Math.min(newX - viewportWidth / 2, maxGameWidth - viewportWidth)
+              : 0
+          );
+          return newX;
+        });
+      } else if (event.code === "ArrowUp" || event.code === "Space") {
+        event.preventDefault();
+        jump();
       }
-      return newPlayerX;
-    });
-  };
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [jump, gameOver, hikeAccomplished]);
 
   const restartGame = () => {
     setPlayerX(50);
@@ -262,9 +268,37 @@ function App() {
       <div className="score">Score: {score}</div>
 
       <div className="controls">
-        <button onClick={moveLeft}>Left</button>
+        <button
+          onClick={() => {
+            setPlayerX((x) => {
+              const newX = Math.max(x - 10, 0);
+              setScrollX((s) =>
+                newX < viewportWidth / 2
+                  ? Math.max(newX - viewportWidth / 2, 0)
+                  : s
+              );
+              return newX;
+            });
+          }}
+        >
+          Left
+        </button>
         <button onClick={jump}>Jump</button>
-        <button onClick={moveRight}>Right</button>
+        <button
+          onClick={() => {
+            setPlayerX((x) => {
+              const newX = Math.min(x + 10, maxGameWidth);
+              setScrollX((s) =>
+                newX > viewportWidth / 2
+                  ? Math.min(newX - viewportWidth / 2, maxGameWidth - viewportWidth)
+                  : 0
+              );
+              return newX;
+            });
+          }}
+        >
+          Right
+        </button>
       </div>
 
       <div style={{ marginTop: "20px" }}>
