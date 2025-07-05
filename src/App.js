@@ -1,71 +1,290 @@
 import React, { useState, useEffect } from "react";
 import Player from "./Player";
 import Platform from "./Platform";
+import Enemy from "./Enemy";
+import watermelonImg from "./watermelon.png";
+import bg from "./background.png";
 import "./App.css";
 
 function App() {
   const [playerX, setPlayerX] = useState(50);
   const [playerY, setPlayerY] = useState(100);
+  const [score, setScore] = useState(0);
+  const [lastLandedPlatformX, setLastLandedPlatformX] = useState(0);
+  const [scrollX, setScrollX] = useState(0);
+  const [gameOver, setGameOver] = useState(false);
+  const [hikeAccomplished, setHikeAccomplished] = useState(false);
+  const [canJumpOffPlatform, setCanJumpOffPlatform] = useState(true);
+
+  const viewportWidth = 900;
+  const playerWidth = 30;
+  const playerHeight = 40;
+
+  const [platforms] = useState([
+    { left: 0, bottom: 0, width: 300 },
+    { left: 300, bottom: 40, width: 150 },
+    { left: 500, bottom: 100, width: 150 },
+    { left: 650, bottom: 160, width: 150 },
+    { left: 800, bottom: 220, width: 150 },
+    { left: 950, bottom: 280, width: 150 },
+    { left: 1150, bottom: 280, width: 200 },
+    { left: 1370, bottom: 280, width: 180 },
+    { left: 1500, bottom: 300, width: 100 },
+    { left: 1510, bottom: 360, width: 100 },
+    { left: 1520, bottom: 420, width: 100 },
+    { left: 1530, bottom: 480, width: 100 },
+    { left: 1540, bottom: 540, width: 100 },
+    { left: 1650, bottom: 540, width: 200 },
+    { left: 1870, bottom: 540, width: 180 },
+  ]);
+
+  const [enemies] = useState([
+    { left: 400, bottom: 60, width: 50, height: 60 },
+    { left: 900, bottom: 300, width: 50, height: 60 },
+    { left: 1600, bottom: 560, width: 50, height: 60 },
+  ]);
+
+  const prize = { left: 2050, bottom: 540, width: 60, height: 60 };
+
+  const maxGameWidth = 2100;
 
   useEffect(() => {
+    if (gameOver || hikeAccomplished) return;
+
     const interval = setInterval(() => {
-      setPlayerY(prevY => {
-        const playerHeight = 30;
-        const platformTop = 20; // platform height
-        const platformBottom = 0;
-        const platformLeft = 0;
-        const platformRight = 300;
+      setPlayerY((prevY) => {
+        const playerBottom = prevY;
+        const playerLeft = playerX;
+        const playerRight = playerX + playerWidth;
+        const playerTop = prevY + playerHeight;
 
-        const isAbovePlatform =
-          prevY > platformBottom + platformTop &&
-          playerX + 30 > platformLeft &&
-          playerX < platformRight;
+        let landed = false;
+        let newY = prevY;
 
-        const isLandingOnPlatform =
-          prevY <= platformBottom + platformTop &&
-          prevY > platformBottom &&
-          playerX + 30 > platformLeft &&
-          playerX < platformRight;
+        // Check landing on platforms
+        platforms.forEach((plat) => {
+          const platTop = plat.bottom + 20;
+          const platLeft = plat.left;
+          const platRight = plat.left + plat.width;
 
-        if (isLandingOnPlatform) {
-          return platformBottom + platformTop; // Set to platform top
+          const isLanding =
+            playerBottom <= platTop &&
+            playerBottom >= platTop - 5 &&
+            playerRight > platLeft &&
+            playerLeft < platRight;
+
+          if (isLanding) {
+            landed = true;
+            newY = platTop;
+            setCanJumpOffPlatform(true); // reset jump ability on landing
+
+            if (plat.left > lastLandedPlatformX) {
+              setScore((prev) => prev + 1);
+              setLastLandedPlatformX(plat.left);
+            }
+          }
+        });
+
+        // Check collision with enemies
+        for (let enemy of enemies) {
+          const enemyLeft = enemy.left;
+          const enemyRight = enemy.left + enemy.width;
+          const enemyBottom = enemy.bottom;
+          const enemyTop = enemy.bottom + enemy.height;
+
+          const horizontalOverlap =
+            playerRight > enemyLeft && playerLeft < enemyRight;
+          const verticalOverlap =
+            playerTop > enemyBottom && playerBottom < enemyTop;
+
+          if (horizontalOverlap && verticalOverlap) {
+            setGameOver(true);
+            return prevY;
+          }
         }
 
-        if (isAbovePlatform) {
-          return prevY - 5; // Continue falling
+        // Check collision with prize
+        const prizeLeft = prize.left;
+        const prizeRight = prize.left + prize.width;
+        const prizeBottom = prize.bottom;
+        const prizeTop = prize.bottom + prize.height;
+
+        const touchesPrize =
+          playerRight > prizeLeft &&
+          playerLeft < prizeRight &&
+          playerTop > prizeBottom &&
+          playerBottom < prizeTop;
+
+        if (touchesPrize) {
+          setHikeAccomplished(true);
+          return prevY;
         }
 
-        // If on ground and not on platform
-        if (prevY > 0 && !isLandingOnPlatform) {
-          return prevY - 5;
+        if (!landed) {
+          if (playerBottom < -50) {
+            setGameOver(true);
+            return prevY;
+          }
+          return playerBottom - 5;
         }
 
-        return 0; // Hit the ground
+        return newY > 0 ? newY : 0;
       });
     }, 100);
 
     return () => clearInterval(interval);
-  }, [playerX]);
+  }, [
+    playerX,
+    platforms,
+    lastLandedPlatformX,
+    gameOver,
+    enemies,
+    hikeAccomplished,
+    prize.left,
+    prize.bottom,
+    prize.width,
+    prize.height,
+  ]);
 
   const jump = () => {
-    const platformTop = 20;
-    const onPlatform = playerY === platformTop || playerY === 0;
-    if (onPlatform) {
-      setPlayerY(playerY + 60);
+    if (gameOver || hikeAccomplished) return;
+
+    const onPlatform = platforms.some((p) => playerY === p.bottom + 20);
+    const onGround = playerY === 0;
+
+    if (onGround || onPlatform) {
+      setPlayerY(playerY + 130); // Reduced jump height here
+      setCanJumpOffPlatform(true); // reset ability on ground/platform jump
+    } else if (canJumpOffPlatform) {
+      setPlayerY(playerY + 130); // Reduced jump height here
+      setCanJumpOffPlatform(false); // consume mid-air jump
     }
+  };
+
+  const moveRight = () => {
+    if (gameOver || hikeAccomplished) return;
+    setPlayerX((prevX) => {
+      const newPlayerX = Math.min(prevX + 10, maxGameWidth);
+      if (newPlayerX > viewportWidth / 2) {
+        setScrollX(
+          Math.min(newPlayerX - viewportWidth / 2, maxGameWidth - viewportWidth)
+        );
+      } else {
+        setScrollX(0);
+      }
+      return newPlayerX;
+    });
+  };
+
+  const moveLeft = () => {
+    if (gameOver || hikeAccomplished) return;
+    setPlayerX((prevX) => {
+      const newPlayerX = Math.max(prevX - 10, 0);
+      if (newPlayerX < viewportWidth / 2) {
+        setScrollX(Math.max(newPlayerX - viewportWidth / 2, 0));
+      }
+      return newPlayerX;
+    });
+  };
+
+  const restartGame = () => {
+    setPlayerX(50);
+    setPlayerY(100);
+    setScore(0);
+    setLastLandedPlatformX(0);
+    setScrollX(0);
+    setGameOver(false);
+    setHikeAccomplished(false);
+    setCanJumpOffPlatform(true);
   };
 
   return (
     <div className="App">
-      <div className="game-board">
-        <Player x={playerX} y={playerY} />
-        <Platform left={0} bottom={0} width={300} />
+      <div
+        className="game-board"
+        style={{
+          backgroundImage: `url(${bg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <Player x={playerX - scrollX} y={playerY} />
+        {platforms.map((plat, index) => (
+          <Platform
+            key={index}
+            left={plat.left - scrollX}
+            bottom={plat.bottom}
+            width={plat.width}
+          />
+        ))}
+
+        {enemies.map((enemy, i) => (
+          <Enemy
+            key={i}
+            left={enemy.left - scrollX}
+            bottom={enemy.bottom}
+            width={enemy.width}
+            height={enemy.height}
+          />
+        ))}
+
+        <img
+          src={watermelonImg}
+          alt="Watermelon Prize"
+          style={{
+            position: "absolute",
+            left: prize.left - scrollX,
+            bottom: prize.bottom,
+            width: prize.width,
+            height: prize.height,
+            userSelect: "none",
+            pointerEvents: "none",
+            zIndex: 3,
+          }}
+        />
+
+        {gameOver && (
+          <div className="game-over">
+            <h1>Game Over</h1>
+            <button onClick={restartGame}>Restart</button>
+          </div>
+        )}
+
+        {hikeAccomplished && (
+          <div className="game-over">
+            <h1>Hike accomplished!</h1>
+            <button onClick={restartGame}>Play Again</button>
+          </div>
+        )}
       </div>
 
+      <div className="score">Score: {score}</div>
+
       <div className="controls">
-        <button onClick={() => setPlayerX(playerX - 10)}>Left</button>
+        <button onClick={moveLeft}>Left</button>
         <button onClick={jump}>Jump</button>
-        <button onClick={() => setPlayerX(playerX + 10)}>Right</button>
+        <button onClick={moveRight}>Right</button>
+      </div>
+
+      <div style={{ marginTop: "20px" }}>
+        <button
+          onClick={restartGame}
+          style={{
+            padding: "12px 24px",
+            fontSize: "18px",
+            backgroundColor: "#ff4d4d",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            cursor: "pointer",
+            transition: "background 0.3s ease",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#cc3a3a")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#ff4d4d")}
+        >
+          Restart Game
+        </button>
       </div>
     </div>
   );
