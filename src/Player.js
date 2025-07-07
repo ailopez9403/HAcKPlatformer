@@ -1,30 +1,26 @@
-
-
 class Player
 {
-  constructor()
-  {
-    this.position =
+    constructor()
     {
-      x:0,
-      y:0
+        this.position =
+        {
+            x:0,
+            y:0,
+        }
     }
-  }
 
-  draw(context) {
-    context.fillStyle = 'red';
-    context.fillRect(this.position.x,this.position.y,100,100);
+    draw(context) 
+    {
+        context.fillStyle = 'red';
+        context.fillRect(this.position.x, this.position.y, 100, 100);
+    }
 
-  }
-
-  update(context) 
-  {
-    this.draw(context);
-    this.position.y++;
-  }
+    update(context) 
+    {
+        this.draw(context);
+        this.position.y++;
+    }
 
 }
-  
-
 
 export default Player;
