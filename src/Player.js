@@ -1,19 +1,22 @@
-import React from "react";
 
-function Player({ x, y }) {
-  return (
-    <div
-      className="player"
-      style={{
-        position: "absolute",
-        left: `${x}px`,
-        bottom: `${y}px`,
-        width: "30px",
-        height: "30px",
-        backgroundColor: "blue"
-      }}
-    />
-  );
+
+
+class Player
+{
+  constructor(x,y,size)
+  {
+    this.position = {
+      x:0,
+      y:0
+    }
+  }
+
+  draw(context) {
+    
+
+  }
 }
+
+
 
 export default Player;
