@@ -18,8 +18,8 @@ const PlatformerGame = ({width, height, tilesize}) => {
     <div
         style={{
         display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        justifyContent: 'center', //Centered canvas 
+        alignItems: 'center', 
         height: '100vh', // full screen height
         backgroundColor: '#f0f0f0',
       }}
