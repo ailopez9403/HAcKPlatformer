@@ -4,7 +4,7 @@ import PlatformerGame from "./PlatformerGame.js";
 
 const App = () => (
   <div className="App">
-    <PlatformerGame width={50} height={40} tilesize={16} />
+    <PlatformerGame width={70} height={50} tilesize={16} />
   </div>
 );
 

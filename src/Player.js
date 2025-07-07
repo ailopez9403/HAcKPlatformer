@@ -12,12 +12,19 @@ class Player
   }
 
   draw(context) {
-    context.fillStyle = '#f00';
-    context.fillRect(20,20,20,20);
+    context.fillStyle = 'red';
+    context.fillRect(this.position.x,this.position.y,100,100);
 
   }
-}
 
+  update(context) 
+  {
+    this.draw(context);
+    this.position.y++;
+  }
+
+}
+  
 
 
 export default Player;

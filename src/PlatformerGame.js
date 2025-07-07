@@ -2,18 +2,30 @@ import React, { useRef, useEffect, useState } from "react";
 import Player from "./Player";
 
 
+
 const PlatformerGame = ({width, height, tilesize}) => {
     
     
     const canvasRef= useRef();
-    const [player, setPlayer] = useState(new Player())
+    const [player, setPlayer] = useState(new Player());
+
     useEffect(() =>{
         console.log('Draw to canvas');
         const ctx = canvasRef.current.getContext('2d');
         ctx.clearRect(0,0,width*tilesize,height*tilesize);
-        player.draw(ctx);
+        animate(ctx);
+
     });
 
+    function animate(context)
+    {
+        const ctx = canvasRef.current.getContext('2d');
+        window.requestAnimationFrame(animate);
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0,0,1120,800);
+        player.update(ctx);
+
+    }
     return (
     <div
         style={{
@@ -38,3 +50,6 @@ const PlatformerGame = ({width, height, tilesize}) => {
 
 
 export default PlatformerGame
+
+
+/* */
