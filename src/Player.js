@@ -1,18 +1,19 @@
 
 
-
 class Player
 {
-  constructor(x,y,size)
+  constructor()
   {
-    this.position = {
+    this.position =
+    {
       x:0,
       y:0
     }
   }
 
   draw(context) {
-    
+    context.fillStyle = '#f00';
+    context.fillRect(20,20,20,20);
 
   }
 }
