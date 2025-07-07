@@ -9,7 +9,7 @@ const PlatformerGame = ({width, height, tilesize}) => {
         const ctx = canvasRef.current.getContext('2d');
         console.log('Draw to canvas');
         ctx.clearRect(0,0,width*tilesize,height*tilesize);
-
+ 
         function loop() {
             animate(ctx); // correctly pass the context
             requestAnimationFrame(loop); // loop properly
@@ -21,7 +21,7 @@ const PlatformerGame = ({width, height, tilesize}) => {
     function animate(context)
     {
         context.fillStyle = 'white';
-        context.fillRect(0,0,1120,800);
+        context.fillRect(0,0,width * tilesize,height * tilesize);
         player.update(context);
     }
 
