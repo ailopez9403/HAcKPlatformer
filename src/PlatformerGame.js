@@ -1,6 +1,12 @@
 import React, { useRef, useEffect, useState } from "react";
 import Player from "./Player";
 
+function updatePlayer(player, canvasHeight, context) {
+    player.draw(context);
+    player.position.y += player.velocity.y;
+    player.velocity.y += player.gravity;
+}
+
 const PlatformerGame = ({ width, height }) => {
     // manually throttle game so it won't run faster than targetFPS
     let lastTime = 0;
@@ -21,17 +27,13 @@ const PlatformerGame = ({ width, height }) => {
             if (currentTime - lastTime < frameDuration) return;
             lastTime = currentTime;
 
-            animate(ctx);
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            updatePlayer(player, height, ctx);
         }
 
         loop();
     });
-
-    function animate(context) {
-        context.fillStyle = 'white';
-        context.fillRect(0, 0, width, height);
-        player.update(context);
-    }
 
     return (
         <div

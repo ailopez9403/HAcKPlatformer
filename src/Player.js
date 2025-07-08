@@ -6,19 +6,14 @@ class Player
             x: 0,
             y: 1,
         }
+        this.gravity = 0.25;
+        this.height = 100;
     }
 
     draw(context) {
         context.fillStyle = 'red';
-        context.fillRect(this.position.x, this.position.y, 100, 100);
+        context.fillRect(this.position.x, this.position.y, 100, this.height);
     }
-
-    update(context) {
-        this.draw(context);
-        this.position.y += this.velocity.y;
-        this.velocity.y += 0.5;
-    }
-
 }
 
 export default Player;
