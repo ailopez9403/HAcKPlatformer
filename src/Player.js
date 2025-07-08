@@ -14,6 +14,16 @@ class Player
         context.fillStyle = 'red';
         context.fillRect(this.position.x, this.position.y, 100, this.height);
     }
+
+    moveLeft() {
+        this.velocity.x = -10;
+    }
+    moveRight() {
+        this.velocity.x = 10;
+    }
+    jump() {
+        this.velocity.y = -10
+    }
 }
 
 export default Player;

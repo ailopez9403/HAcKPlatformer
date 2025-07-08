@@ -1,10 +1,18 @@
 import React, { useRef, useEffect, useState } from "react";
 import Player from "./Player";
+import InputManager from "./InputManager";
 
 function updatePlayer(player, canvasHeight, context) {
     player.draw(context);
+
     player.position.y += player.velocity.y;
-    player.velocity.y += player.gravity;
+    player.position.x += player.velocity.x;
+    
+    if (player.position.y + player.height + player.velocity.y < canvasHeight) {
+        player.velocity.y += player.gravity;
+    } else {
+        player.velocity.y = 0;
+    }
 }
 
 const PlatformerGame = ({ width, height }) => {
@@ -15,6 +23,34 @@ const PlatformerGame = ({ width, height }) => {
 
     const canvasRef= useRef();
     const [player, setPlayer] = useState(new Player({ x: 0, y: 0 }));
+
+    let inputManager = new InputManager();
+    const movePlayer = (action) => {
+        switch (action) {
+            case 'moveLeft':
+                player.moveLeft();
+                break;
+            case 'moveRight':
+                player.moveRight();
+                break;
+            case 'jump':
+                player.jump();
+                break;
+            default:
+                break;
+        }
+    };
+
+    useEffect(() =>{
+        console.log('Bind input');
+        inputManager.bindKeys();
+        inputManager.subscribe(movePlayer); 
+
+        return () => {
+            inputManager.unbindKeys();
+            inputManager.unsubscribe(movePlayer);
+        }
+    });
 
     useEffect(() => {
         const ctx = canvasRef.current.getContext('2d');
