@@ -24,7 +24,7 @@ class Player
         this.velocity.x += 10;
     }
     jump() {
-        this.velocity.y += -10;
+        this.velocity.y = -10;
     }
     stopLeft() {
         this.velocity.x += 10;
