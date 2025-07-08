@@ -16,4 +16,4 @@ function Platform({ left, bottom, width }) {
   );
 }
 
-export default Platform;
+export default Platform;  
