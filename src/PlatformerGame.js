@@ -1,27 +1,35 @@
 import React, { useRef, useEffect, useState } from "react";
 import Player from "./Player";
 
-const PlatformerGame = ({ width, height, tilesize }) => {
+const PlatformerGame = ({ width, height }) => {
+    // manually throttle game so it won't run faster than targetFPS
+    let lastTime = 0;
+    const targetFPS = 120;
+    const frameDuration = 1000 / targetFPS;
+
     const canvasRef= useRef();
-    const [player, setPlayer] = useState(new Player());
+    const [player, setPlayer] = useState(new Player({ x: 0, y: 0 }));
 
     useEffect(() => {
         const ctx = canvasRef.current.getContext('2d');
         console.log('Draw to canvas');
-        ctx.clearRect(0, 0, width * tilesize, height * tilesize);
+        ctx.clearRect(0, 0, width, height);
  
-        function loop() {
-            animate(ctx); // correctly pass the context
-            requestAnimationFrame(loop); // loop properly
+        function loop(currentTime) {
+            requestAnimationFrame(loop);
+
+            if (currentTime - lastTime < frameDuration) return;
+            lastTime = currentTime;
+
+            animate(ctx);
         }
 
-        loop()
+        loop();
     });
 
-    function animate(context)
-    {
+    function animate(context) {
         context.fillStyle = 'white';
-        context.fillRect(0, 0, width * tilesize, height * tilesize);
+        context.fillRect(0, 0, width, height);
         player.update(context);
     }
 
@@ -38,8 +46,8 @@ const PlatformerGame = ({ width, height, tilesize }) => {
 
             <canvas 
                 ref={ canvasRef }
-                width={ width * tilesize }
-                height={ height * tilesize }
+                width={ width }
+                height={ height }
                 style={{ border: '1px solid black' }}
             ></canvas>
 
