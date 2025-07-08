@@ -5,7 +5,7 @@ import Enemy from "./Enemy";
 import watermelonImg from "./watermelon.png";
 import duckImg from "./Duck_Character.png";  // updated import
 import bigfootImg from "./bigfoot.png";
-import bg from "./background.png";
+import bg from "./daytime.jpg";
 import "./App.css";
 
 function App() {
