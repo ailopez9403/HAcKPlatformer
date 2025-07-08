@@ -1,16 +1,17 @@
 import React from "react";
+import duckImage from "./Duck_Character.png"; // adjust the path if needed
 
 function Player({ x, y }) {
   return (
-    <div
-      className="player"
+    <img
+      src={duckImage}
+      alt="Duck Character"
       style={{
         position: "absolute",
-        left: `${x}px`,
-        bottom: `${y}px`,
-        width: "30px",
-        height: "30px",
-        backgroundColor: "blue"
+        left: x,
+        bottom: y,
+        width: 50, // or whatever size fits
+        height: 50,
       }}
     />
   );
