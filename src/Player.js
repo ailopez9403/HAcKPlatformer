@@ -16,13 +16,21 @@ class Player
     }
 
     moveLeft() {
-        this.velocity.x = -10;
+        if (this.velocity.x > -10)
+            this.velocity.x += -10;
     }
     moveRight() {
-        this.velocity.x = 10;
+        if (this.velocity.x < 10)
+        this.velocity.x += 10;
     }
     jump() {
-        this.velocity.y = -10
+        this.velocity.y += -10;
+    }
+    stopLeft() {
+        this.velocity.x += 10;
+    }
+    stopRight() {
+        this.velocity.x += -10;
     }
 }
 

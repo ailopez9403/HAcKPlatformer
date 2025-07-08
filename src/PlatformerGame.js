@@ -7,7 +7,7 @@ function updatePlayer(player, canvasHeight, context) {
 
     player.position.y += player.velocity.y;
     player.position.x += player.velocity.x;
-    
+
     if (player.position.y + player.height + player.velocity.y < canvasHeight) {
         player.velocity.y += player.gravity;
     } else {
@@ -35,6 +35,12 @@ const PlatformerGame = ({ width, height }) => {
                 break;
             case 'jump':
                 player.jump();
+                break;
+            case 'stopLeft':
+                player.stopLeft();
+                break;
+            case 'stopRight':
+                player.stopRight();
                 break;
             default:
                 break;

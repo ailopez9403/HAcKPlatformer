@@ -13,7 +13,7 @@ class InputManager
         this.observer.forEach(subscriber => subscriber(action));
     }
 
-    handleKeys = e => {
+    handleKeyDown = e => {
         e.preventDefault();
         switch (e.keyCode)
         {
@@ -33,11 +33,28 @@ class InputManager
         }
     };
 
+    handleKeyUp = e => {
+        e.preventDefault();
+        switch (e.keyCode)
+        {
+            case 37:
+                this.broadcast('stopLeft');
+                break;
+            case 39: 
+                this.broadcast('stopRight');
+                break;
+            default:
+                break;
+        }
+    };
+
     bindKeys() {
-        document.addEventListener('keydown', this.handleKeys);
+        document.addEventListener('keydown', this.handleKeyDown);
+        document.addEventListener('keyup', this.handleKeyUp);
     }
     unbindKeys() {
-        document.removeEventListener('keydown', this.handleKeys);
+        document.removeEventListener('keydown', this.handleKeyDown);
+        document.removeEventListener('keyup', this.handleKeyUp);
     }
 }
 
