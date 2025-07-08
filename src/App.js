@@ -129,7 +129,7 @@ function App() {
     }, 1000 / 60);
 
     return () => clearInterval(interval);
-  }, [velocityX, velocityY, playerX, playerY, gameOver, hikeAccomplished, platforms, isJumping, GRAVITY]); // added GRAVITY here
+  }, [velocityX, velocityY, playerX, playerY, gameOver, hikeAccomplished, platforms, isJumping, GRAVITY]);
 
   const handleKeyDown = useCallback((event) => {
     if (gameOver || hikeAccomplished) return;
@@ -190,23 +190,7 @@ function App() {
     setHikeAccomplished(false);
   };
 
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.code === "ArrowLeft") {
-        setPlayerX(prev => prev - 10);
-      } else if (event.code === "ArrowRight") {
-        setPlayerX(prev => prev + 10);
-      } else if (event.code === "ArrowUp") {
-        event.preventDefault(); // prevent page scrolling
-        jump();
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [playerY]);
-  
- return (
+  return (
     <div className="App">
       <div className="game-layout">
         {/* Instructions - Left Panel */}
