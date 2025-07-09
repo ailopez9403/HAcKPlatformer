@@ -3,12 +3,16 @@ import Player from "./Player";
 import Platform from "./Platform";
 import Enemy from "./Enemy";
 import watermelonImg from "./watermelon.png";
-import duckImg from "./Duck_Character.png";  // updated import
+import duckImg from "./Duck_Character.png";
 import bigfootImg from "./bigfoot.png";
 import bg from "./daytime.jpg";
 import "./App.css";
 
 function App() {
+  const [currentScreen, setCurrentScreen] = useState("menu");
+  const [platforms, setPlatforms] = useState([]);
+  const [enemies, setEnemies] = useState([]);
+  const [prize, setPrize] = useState(null);
   const [playerX, setPlayerX] = useState(50);
   const [playerY, setPlayerY] = useState(100);
   const [velocityX, setVelocityX] = useState(0);
@@ -23,40 +27,48 @@ function App() {
   const MOVE_ACCELERATION = 2;
   const MAX_SPEED = 8;
   const FRICTION = 0.2;
-
   const viewportWidth = 900;
   const playerWidth = 50;
   const playerHeight = 50;
   const maxGameWidth = 2100;
 
-  const [platforms] = useState([
-    { left: 0, bottom: 0, width: 300 },
-    { left: 300, bottom: 40, width: 150 },
-    { left: 500, bottom: 100, width: 150 },
-    { left: 650, bottom: 160, width: 150 },
-    { left: 800, bottom: 220, width: 150 },
-    { left: 950, bottom: 280, width: 200 },
-    { left: 950, bottom: 280, width: 200 },
-    { left: 1500, bottom: 300, width: 100 },
-    { left: 1510, bottom: 360, width: 100 },
-    { left: 1520, bottom: 420, width: 100 },
-    { left: 1530, bottom: 480, width: 100 },
-    { left: 1540, bottom: 540, width: 100 },
-    { left: 1870, bottom: 540, width: 180 },
-  ]);
-
-  const [enemies] = useState([
-    { left: 400, bottom: 60, width: 50, height: 60 },
-    { left: 900, bottom: 300, width: 50, height: 60 },
-    { left: 1600, bottom: 560, width: 50, height: 60 },
-  ]);
-
-  const prize = useMemo(() => ({
-    left: 2050,
-    bottom: 540,
-    width: 60,
-    height: 60,
+  const level1 = useMemo(() => ({
+    platforms: [
+      { left: 0, bottom: 0, width: 300 },
+      { left: 300, bottom: 40, width: 150 },
+      { left: 500, bottom: 100, width: 150 },
+      { left: 650, bottom: 160, width: 150 },
+      { left: 800, bottom: 220, width: 150 },
+      { left: 950, bottom: 280, width: 200 },
+      { left: 1500, bottom: 300, width: 100 },
+      { left: 1510, bottom: 360, width: 100 },
+      { left: 1520, bottom: 420, width: 100 },
+      { left: 1530, bottom: 480, width: 100 },
+      { left: 1540, bottom: 540, width: 100 },
+      { left: 1870, bottom: 540, width: 180 },
+    ],
+    enemies: [
+      { left: 400, bottom: 60, width: 50, height: 60 },
+      { left: 900, bottom: 300, width: 50, height: 60 },
+      { left: 1600, bottom: 560, width: 50, height: 60 },
+    ],
+    prize: { left: 2050, bottom: 540, width: 60, height: 60 },
   }), []);
+
+  const startLevel = () => {
+    setPlatforms(level1.platforms);
+    setEnemies(level1.enemies);
+    setPrize(level1.prize);
+    setPlayerX(50);
+    setPlayerY(100);
+    setVelocityX(0);
+    setVelocityY(0);
+    setIsJumping(false);
+    setScrollX(0);
+    setGameOver(false);
+    setHikeAccomplished(false);
+    setCurrentScreen("game");
+  };
 
   function checkCollision(rect1, rect2) {
     return !(
@@ -68,7 +80,7 @@ function App() {
   }
 
   useEffect(() => {
-    if (gameOver || hikeAccomplished) return;
+    if (currentScreen !== "game" || gameOver || hikeAccomplished) return;
 
     const interval = setInterval(() => {
       setVelocityY((vy) => vy + GRAVITY);
@@ -129,10 +141,10 @@ function App() {
     }, 1000 / 60);
 
     return () => clearInterval(interval);
-  }, [velocityX, velocityY, playerX, playerY, gameOver, hikeAccomplished, platforms, isJumping, GRAVITY]);
+  }, [velocityX, velocityY, playerX, playerY, gameOver, hikeAccomplished, platforms, isJumping, GRAVITY, currentScreen]);
 
   const handleKeyDown = useCallback((event) => {
-    if (gameOver || hikeAccomplished) return;
+    if (currentScreen !== "game" || gameOver || hikeAccomplished) return;
 
     if (event.code === "ArrowLeft") {
       setVelocityX((vx) => Math.max(vx - MOVE_ACCELERATION, -MAX_SPEED));
@@ -142,7 +154,7 @@ function App() {
       setVelocityY(JUMP_VELOCITY);
       setIsJumping(true);
     }
-  }, [gameOver, hikeAccomplished, isJumping]);
+  }, [currentScreen, gameOver, hikeAccomplished, isJumping]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -150,7 +162,7 @@ function App() {
   }, [handleKeyDown]);
 
   useEffect(() => {
-    if (gameOver || hikeAccomplished) return;
+    if (currentScreen !== "game" || gameOver || hikeAccomplished) return;
 
     const playerRect = {
       left: playerX,
@@ -177,118 +189,103 @@ function App() {
     if (checkCollision(playerRect, prize)) {
       setHikeAccomplished(true);
     }
-  }, [playerX, playerY, enemies, prize, gameOver, hikeAccomplished]);
+  }, [playerX, playerY, enemies, prize, gameOver, hikeAccomplished, currentScreen]);
 
   const restartGame = () => {
-    setPlayerX(50);
-    setPlayerY(100);
-    setVelocityX(0);
-    setVelocityY(0);
-    setIsJumping(false);
-    setScrollX(0);
-    setGameOver(false);
-    setHikeAccomplished(false);
+    startLevel();
   };
 
   return (
     <div className="App">
-      <div className="game-layout">
-        {/* Instructions - Left Panel */}
-        <div className="instructions">
-          <h3>Controls</h3>
-          <p>← Left Arrow: Move Left</p>
-          <p>→ Right Arrow: Move Right</p>
-          <p>↑ Up Arrow or Space: Jump</p>
+      {currentScreen === "menu" ? (
+        <div className="menu-screen">
+          <h1>Platformer Game</h1>
+          <h2>Select a Level</h2>
+          <button onClick={startLevel}>Start Level One</button>
+          <div className="instructions">
+            <h3>Controls</h3>
+            <p>← Left Arrow: Move Left</p>
+            <p>→ Right Arrow: Move Right</p>
+            <p>↑ Up Arrow or Space: Jump</p>
+          </div>
         </div>
-
-        {/* Game Area - Center */}
-        <div
-          className="game-board"
-          style={{
-            backgroundImage: `url(${bg})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            backgroundRepeat: "no-repeat",
-            position: "relative",
-            overflow: "hidden",
-            width: viewportWidth,
-            height: 600,
-          }}
-        >
-          <Player x={playerX - scrollX} y={playerY} img={duckImg} />
-          {platforms.map((plat, index) => (
-            <Platform
-              key={index}
-              left={plat.left - scrollX}
-              bottom={plat.bottom}
-              width={plat.width}
-            />
-          ))}
-          {enemies.map((enemy, i) => (
-            <Enemy
-              key={i}
-              left={enemy.left - scrollX}
-              bottom={enemy.bottom}
-              width={enemy.width}
-              height={enemy.height}
-              img={bigfootImg}
-            />
-          ))}
-          <img
-            src={watermelonImg}
-            alt="Watermelon Prize"
-            style={{
-              position: "absolute",
-              left: prize.left - scrollX,
-              bottom: prize.bottom,
-              width: prize.width,
-              height: prize.height,
-              userSelect: "none",
-              pointerEvents: "none",
-              zIndex: 3,
-            }}
-          />
-          {(gameOver || hikeAccomplished) && (
-            <div className="game-over">
-              <h1>{gameOver ? "Game Over" : "Hike Accomplished!"}</h1>
-              <button onClick={restartGame}>Restart Game</button>
+      ) : (
+        <div className="game-layout" style={{ display: "flex", flexDirection: "row" }}>
+          <div className="side-panel" style={{ marginRight: 10 }}>
+            <div className="instructions">
+              <h3>Controls</h3>
+              <p>← Left Arrow: Move Left</p>
+              <p>→ Right Arrow: Move Right</p>
+              <p>↑ Up Arrow or Space: Jump</p>
             </div>
-          )}
-        </div>
-
-        {/* Controls - Right Panel */}
-        <div className="side-panel">
-          <div className="controls">
-            <button onClick={() => setVelocityX((vx) => Math.max(vx - MOVE_ACCELERATION, -MAX_SPEED))}>Left</button>
-            <button onClick={() => {
-              if (!isJumping) {
-                setVelocityY(JUMP_VELOCITY);
-                setIsJumping(true);
-              }
-            }}>Jump</button>
-            <button onClick={() => setVelocityX((vx) => Math.min(vx + MOVE_ACCELERATION, MAX_SPEED))}>Right</button>
+            <div className="controls">
+              <button onClick={() => setVelocityX((vx) => Math.max(vx - MOVE_ACCELERATION, -MAX_SPEED))}>
+                Left
+              </button>
+              <button
+                onClick={() => {
+                  if (!isJumping) {
+                    setVelocityY(JUMP_VELOCITY);
+                    setIsJumping(true);
+                  }
+                }}
+              >
+                Jump
+              </button>
+              <button onClick={() => setVelocityX((vx) => Math.min(vx + MOVE_ACCELERATION, MAX_SPEED))}>Right</button>
+            </div>
+            <button onClick={() => setCurrentScreen("menu")}>Back to Menu</button>
           </div>
-          <div className="restart-button">
-            <button
-              onClick={restartGame}
+          <div
+            className="game-board"
+            style={{
+              backgroundImage: `url(${bg})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+              backgroundRepeat: "no-repeat",
+              position: "relative",
+              overflow: "hidden",
+              width: viewportWidth,
+              height: 600,
+            }}
+          >
+            <Player x={playerX - scrollX} y={playerY} img={duckImg} />
+            {platforms.map((plat, index) => (
+              <Platform key={index} left={plat.left - scrollX} bottom={plat.bottom} width={plat.width} />
+            ))}
+            {enemies.map((enemy, i) => (
+              <Enemy
+                key={i}
+                left={enemy.left - scrollX}
+                bottom={enemy.bottom}
+                width={enemy.width}
+                height={enemy.height}
+                img={bigfootImg}
+              />
+            ))}
+            <img
+              src={watermelonImg}
+              alt="Watermelon Prize"
               style={{
-                padding: "12px 24px",
-                fontSize: "18px",
-                backgroundColor: "#ff4d4d",
-                color: "white",
-                border: "none",
-                borderRadius: "8px",
-                cursor: "pointer",
-                transition: "background 0.3s ease",
+                position: "absolute",
+                left: prize.left - scrollX,
+                bottom: prize.bottom,
+                width: prize.width,
+                height: prize.height,
+                userSelect: "none",
+                pointerEvents: "none",
+                zIndex: 3,
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#cc3a3a")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#ff4d4d")}
-            >
-              Restart Game
-            </button>
+            />
+            {(gameOver || hikeAccomplished) && (
+              <div className="game-over">
+                <h1>{gameOver ? "Game Over" : "Hike Accomplished!"}</h1>
+                <button onClick={restartGame}>Restart Game</button>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
