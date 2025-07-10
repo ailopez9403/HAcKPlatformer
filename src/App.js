@@ -1,354 +1,430 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import Player from "./Player";
 import Platform from "./Platform";
 import Enemy from "./Enemy";
-import watermelonImg from "./watermelon.png";
-import bg from "./background.png";
+import watermelonImg from "./prize.png";
+import duckImg from "./Duck_Character.png";
+import bigfootImg from "./bigfoot.png";
+import bgDay from "./daytime.jpg";
+import bgNight from "./night-time.jpg";
+import bgDusk from "./dawn.jpg";
 import "./App.css";
 
 function App() {
+  const [currentScreen, setCurrentScreen] = useState("menu");
+  const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
+  const [platforms, setPlatforms] = useState([]);
+  const [enemies, setEnemies] = useState([]);
+  const [prize, setPrize] = useState(null);
   const [playerX, setPlayerX] = useState(50);
   const [playerY, setPlayerY] = useState(100);
-  const [score, setScore] = useState(0);
-  const [lastLandedPlatformX, setLastLandedPlatformX] = useState(0);
+  const [velocityX, setVelocityX] = useState(0);
+  const [velocityY, setVelocityY] = useState(0);
+  const [isJumping, setIsJumping] = useState(false);
   const [scrollX, setScrollX] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [hikeAccomplished, setHikeAccomplished] = useState(false);
-  const [canJumpOffPlatform, setCanJumpOffPlatform] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [nextLevelToLoad, setNextLevelToLoad] = useState(null);
 
+  const GRAVITY = -0.3;
+  const JUMP_VELOCITY = 12;
+  const MOVE_ACCELERATION = 2;
+  const MAX_SPEED = 8;
+  const FRICTION = 0.2;
   const viewportWidth = 900;
-  const playerWidth = 30;
-  const playerHeight = 40;
+  const playerWidth = 50;
+  const playerHeight = 50;
   const maxGameWidth = 2100;
 
-  const [platforms] = useState([
-    { left: 0, bottom: 0, width: 300 },
-    { left: 300, bottom: 40, width: 150 },
-    { left: 500, bottom: 100, width: 150 },
-    { left: 650, bottom: 160, width: 150 },
-    { left: 800, bottom: 220, width: 150 },
-    { left: 950, bottom: 280, width: 150 },
-    { left: 1150, bottom: 280, width: 200 },
-    { left: 1370, bottom: 280, width: 180 },
-    { left: 1500, bottom: 300, width: 100 },
-    { left: 1510, bottom: 360, width: 100 },
-    { left: 1520, bottom: 420, width: 100 },
-    { left: 1530, bottom: 480, width: 100 },
-    { left: 1540, bottom: 540, width: 100 },
-    { left: 1650, bottom: 540, width: 200 },
-    { left: 1870, bottom: 540, width: 180 },
-  ]);
+  const levels = useMemo(() => [
+    {
+      name: "Daytime",
+      background: bgDay,
+      platforms: [
+        { left: 0, bottom: 0, width: 300 },
+        { left: 300, bottom: 40, width: 150 },
+        { left: 500, bottom: 100, width: 150 },
+        { left: 650, bottom: 160, width: 150 },
+        { left: 800, bottom: 220, width: 150 },
+        { left: 950, bottom: 280, width: 200 },
+        { left: 1500, bottom: 300, width: 100 },
+        { left: 1510, bottom: 360, width: 100 },
+        { left: 1520, bottom: 420, width: 100 },
+        { left: 1530, bottom: 480, width: 100 },
+        { left: 1540, bottom: 540, width: 100 },
+        { left: 1870, bottom: 540, width: 180 },
+      ],
+      enemies: [
+        { left: 400, bottom: 60, width: 50, height: 60 },
+        { left: 900, bottom: 300, width: 50, height: 60 },
+        { left: 1600, bottom: 560, width: 50, height: 60 },
+      ],
+      prize: { left: 2050, bottom: 540, width: 60, height: 60 },
+    },
+    {
+      name: "Night",
+      background: bgNight,
+      platforms: [
+        { left: 0, bottom: 0, width: 400 },
+        { left: 450, bottom: 70, width: 100 },
+        { left: 600, bottom: 150, width: 120 },
+        { left: 800, bottom: 200, width: 120 },
+        { left: 950, bottom: 300, width: 150 },
+        { left: 1200, bottom: 370, width: 150 },
+        { left: 1450, bottom: 400, width: 180 },
+        { left: 1800, bottom: 500, width: 160 },
+      ],
+      enemies: [
+        { left: 700, bottom: 170, width: 50, height: 60 },
+        { left: 1300, bottom: 380, width: 50, height: 60 },
+        { left: 1900, bottom: 510, width: 50, height: 60 },
+      ],
+      prize: { left: 2050, bottom: 500, width: 60, height: 60 },
+    },
+    {
+      name: "Dusk",
+      background: bgDusk,
+      platforms: [
+        { left: 0, bottom: 0, width: 300 },
+        { left: 400, bottom: 100, width: 100 },
+        { left: 600, bottom: 200, width: 120 },
+        { left: 800, bottom: 300, width: 100 },
+        { left: 1000, bottom: 400, width: 80 },
+        { left: 1200, bottom: 500, width: 80 },
+        { left: 1400, bottom: 450, width: 80 },
+        { left: 1600, bottom: 350, width: 80 },
+        { left: 1950, bottom: 320, width: 100 },
+      ],
+      enemies: [
+        { left: 500, bottom: 120, width: 50, height: 60 },
+        { left: 850, bottom: 320, width: 50, height: 60 },
+        { left: 1100, bottom: 420, width: 50, height: 60 },
+        { left: 1300, bottom: 520, width: 50, height: 60 },
+        { left: 1700, bottom: 360, width: 50, height: 60 },
+      ],
+      prize: { left: 2050, bottom: 320, width: 60, height: 60 },
+    },
+  ], []);
 
-  const [enemies] = useState([
-    { left: 400, bottom: 60, width: 50, height: 60 },
-    { left: 900, bottom: 300, width: 50, height: 60 },
-    { left: 1600, bottom: 560, width: 50, height: 60 },
-  ]);
+  const loadLevel = useCallback((index) => {
+    const level = levels[index];
+    setCurrentLevelIndex(index);
+    setPlatforms(level.platforms);
+    setEnemies(level.enemies);
+    setPrize(level.prize);
+    setPlayerX(50);
+    setPlayerY(100);
+    setVelocityX(0);
+    setVelocityY(0);
+    setIsJumping(false);
+    setScrollX(0);
+    setGameOver(false);
+    setHikeAccomplished(false);
+    setCurrentScreen("game");
+  }, [levels]);
 
-  const prize = { left: 2050, bottom: 540, width: 60, height: 60 };
+  const startTransitionToLevel = (index) => {
+    setIsTransitioning(true);
+    setNextLevelToLoad(index);
+  };
+
+  const handleOverlayAnimationEnd = (e) => {
+    if (e.animationName === "wipeExpand") {
+      if (nextLevelToLoad !== null) {
+        loadLevel(nextLevelToLoad);
+        setNextLevelToLoad(null);
+        e.target.classList.remove("expand");
+        e.target.classList.add("contract");
+      }
+    } else if (e.animationName === "wipeContract") {
+      setIsTransitioning(false);
+      e.target.classList.remove("contract");
+    }
+  };
 
   useEffect(() => {
-    if (gameOver || hikeAccomplished) return;
+    if (currentScreen !== "game" || gameOver || hikeAccomplished) return;
 
     const interval = setInterval(() => {
+      setVelocityY((vy) => vy + GRAVITY);
+
       setPlayerY((prevY) => {
-        const playerBottom = prevY;
+        const nextY = prevY + velocityY;
+        const playerBottomNext = nextY;
+        const playerBottomPrev = prevY;
         const playerLeft = playerX;
         const playerRight = playerX + playerWidth;
-        const playerTop = prevY + playerHeight;
 
         let landed = false;
-        let newY = prevY;
+        let correctedY = nextY;
 
-        // Check landing on platforms
         platforms.forEach((plat) => {
           const platTop = plat.bottom + 20;
           const platLeft = plat.left;
           const platRight = plat.left + plat.width;
 
-          const isLanding =
-            playerBottom <= platTop &&
-            playerBottom >= platTop - 5 &&
-            playerRight > platLeft &&
-            playerLeft < platRight;
+          const wasAbovePlatform = playerBottomPrev >= platTop;
+          const isBelowPlatform = playerBottomNext <= platTop;
 
-          if (isLanding) {
+          const horizontalOverlap =
+            playerRight > platLeft && playerLeft < platRight;
+
+          const isFallingThrough =
+            velocityY <= 0 &&
+            wasAbovePlatform &&
+            isBelowPlatform &&
+            horizontalOverlap;
+
+          if (isFallingThrough) {
             landed = true;
-            newY = platTop;
-            setCanJumpOffPlatform(true); // reset jump ability on landing
-
-            if (plat.left > lastLandedPlatformX) {
-              setScore((prev) => prev + 1);
-              setLastLandedPlatformX(plat.left);
-            }
+            correctedY = platTop;
+            setVelocityY(0);
+            setIsJumping(false);
           }
         });
 
-        // Check collision with enemies
-        for (let enemy of enemies) {
-          const enemyLeft = enemy.left;
-          const enemyRight = enemy.left + enemy.width;
-          const enemyBottom = enemy.bottom;
-          const enemyTop = enemy.bottom + enemy.height;
-
-          const horizontalOverlap =
-            playerRight > enemyLeft && playerLeft < enemyRight;
-          const verticalOverlap =
-            playerTop > enemyBottom && playerBottom < enemyTop;
-
-          if (horizontalOverlap && verticalOverlap) {
-            setGameOver(true);
-            return prevY;
-          }
-        }
-
-        // Check collision with prize
-        const prizeLeft = prize.left;
-        const prizeRight = prize.left + prize.width;
-        const prizeBottom = prize.bottom;
-        const prizeTop = prize.bottom + prize.height;
-
-        const touchesPrize =
-          playerRight > prizeLeft &&
-          playerLeft < prizeRight &&
-          playerTop > prizeBottom &&
-          playerBottom < prizeTop;
-
-        if (touchesPrize) {
-          setHikeAccomplished(true);
+        if (!landed && nextY < 0) {
+          setGameOver(true);
           return prevY;
         }
 
-        if (!landed) {
-          if (playerBottom < -50) {
-            setGameOver(true);
-            return prevY;
-          }
-          return playerBottom - 5;
+        return correctedY;
+      });
+
+      setPlayerX((prevX) => {
+        let newVX = velocityX;
+
+        if (!isJumping) {
+          if (velocityX > 0) newVX = Math.max(velocityX - FRICTION, 0);
+          else if (velocityX < 0) newVX = Math.min(velocityX + FRICTION, 0);
         }
 
-        return newY > 0 ? newY : 0;
+        setVelocityX(newVX);
+
+        const newX = Math.min(Math.max(0, prevX + newVX), maxGameWidth);
+        setScrollX(
+          newX > viewportWidth / 2
+            ? Math.min(newX - viewportWidth / 2, maxGameWidth - viewportWidth)
+            : 0
+        );
+        return newX;
       });
-    }, 100);
+    }, 1000 / 60);
 
     return () => clearInterval(interval);
   }, [
+    velocityX,
+    velocityY,
     playerX,
-    platforms,
-    lastLandedPlatformX,
+    playerY,
     gameOver,
-    enemies,
     hikeAccomplished,
-    prize.left,
-    prize.bottom,
-    prize.width,
-    prize.height,
+    platforms,
+    isJumping,
+    GRAVITY,
+    currentScreen,
   ]);
 
-  // Use useCallback to memoize jump and avoid stale closures + eslint warnings
-  const jump = useCallback(() => {
-    if (gameOver || hikeAccomplished) return;
+  const handleKeyDown = useCallback((event) => {
+    if (currentScreen !== "game" || gameOver || hikeAccomplished) return;
 
-    const onPlatform = platforms.some((p) => playerY === p.bottom + 20);
-    const onGround = playerY === 0;
-
-    if (onGround || onPlatform) {
-      setPlayerY(playerY + 130);
-      setCanJumpOffPlatform(true);
-    } else if (canJumpOffPlatform) {
-      setPlayerY(playerY + 130);
-      setCanJumpOffPlatform(false);
+    if (event.code === "ArrowLeft") {
+      setVelocityX((vx) => Math.max(vx - MOVE_ACCELERATION, -MAX_SPEED));
+    } else if (event.code === "ArrowRight") {
+      setVelocityX((vx) => Math.min(vx + MOVE_ACCELERATION, MAX_SPEED));
+    } else if ((event.code === "Space" || event.code === "ArrowUp") && !isJumping) {
+      setVelocityY(JUMP_VELOCITY);
+      setIsJumping(true);
     }
-  }, [gameOver, hikeAccomplished, platforms, playerY, canJumpOffPlatform]);
+  }, [currentScreen, gameOver, hikeAccomplished, isJumping]);
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (gameOver || hikeAccomplished) return;
-
-      if (event.code === "ArrowLeft") {
-        setPlayerX((prevX) => {
-          const newX = Math.max(prevX - 10, 0);
-          setScrollX((s) =>
-            newX < viewportWidth / 2 ? Math.max(newX - viewportWidth / 2, 0) : s
-          );
-          return newX;
-        });
-      } else if (event.code === "ArrowRight") {
-        setPlayerX((prevX) => {
-          const newX = Math.min(prevX + 10, maxGameWidth);
-          setScrollX((s) =>
-            newX > viewportWidth / 2
-              ? Math.min(newX - viewportWidth / 2, maxGameWidth - viewportWidth)
-              : 0
-          );
-          return newX;
-        });
-      } else if (event.code === "ArrowUp" || event.code === "Space") {
-        event.preventDefault();
-        jump();
-      }
-    };
-
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [jump, gameOver, hikeAccomplished]);
+  }, [handleKeyDown]);
+
+  useEffect(() => {
+    if (currentScreen !== "game" || gameOver || hikeAccomplished) return;
+
+    const playerRect = {
+      left: playerX,
+      bottom: playerY,
+      width: playerWidth,
+      height: playerHeight,
+    };
+
+    const hitboxPadding = 10;
+
+    for (const enemy of enemies) {
+      const enemyRect = {
+        left: enemy.left + hitboxPadding,
+        bottom: enemy.bottom + hitboxPadding,
+        width: enemy.width - 2 * hitboxPadding,
+        height: enemy.height - 2 * hitboxPadding,
+      };
+
+      if (
+        !(
+          playerRect.left > enemyRect.left + enemyRect.width ||
+          playerRect.left + playerRect.width < enemyRect.left ||
+          playerRect.bottom > enemyRect.bottom + enemyRect.height ||
+          playerRect.bottom + playerRect.height < enemyRect.bottom
+        )
+      ) {
+        setGameOver(true);
+        return;
+      }
+    }
+
+    if (
+      prize &&
+      !(
+        playerRect.left > prize.left + prize.width ||
+        playerRect.left + playerRect.width < prize.left ||
+        playerRect.bottom > prize.bottom + prize.height ||
+        playerRect.bottom + playerRect.height < prize.bottom
+      )
+    ) {
+      setHikeAccomplished(true);
+    }
+  }, [playerX, playerY, enemies, prize, gameOver, hikeAccomplished, currentScreen]);
 
   const restartGame = () => {
-    setPlayerX(50);
-    setPlayerY(100);
-    setScore(0);
-    setLastLandedPlatformX(0);
-    setScrollX(0);
-    setGameOver(false);
-    setHikeAccomplished(false);
-    setCanJumpOffPlatform(true);
+    loadLevel(currentLevelIndex);
   };
 
   return (
     <div className="App">
-      <div
-        className="game-board"
-        style={{
-          backgroundImage: `url(${bg})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-        }}
-      >
-        <Player x={playerX - scrollX} y={playerY} />
-        {platforms.map((plat, index) => (
-          <Platform
-            key={index}
-            left={plat.left - scrollX}
-            bottom={plat.bottom}
-            width={plat.width}
-          />
-        ))}
-
-        {enemies.map((enemy, i) => (
-          <Enemy
-            key={i}
-            left={enemy.left - scrollX}
-            bottom={enemy.bottom}
-            width={enemy.width}
-            height={enemy.height}
-          />
-        ))}
-
-        <img
-          src={watermelonImg}
-          alt="Watermelon Prize"
-          style={{
-            position: "absolute",
-            left: prize.left - scrollX,
-            bottom: prize.bottom,
-            width: prize.width,
-            height: prize.height,
-            userSelect: "none",
-            pointerEvents: "none",
-            zIndex: 3,
-          }}
-        />
-
-        {gameOver && (
-          <div className="game-over">
-            <h1>Game Over</h1>
-            <button onClick={restartGame}>Restart</button>
+      {currentScreen === "menu" ? (
+        <div className="menu-screen">
+          <h1>Platformer Game</h1>
+          <h2>Select a Level</h2>
+          {levels.map((lvl, i) => (
+            <button key={i} onClick={() => loadLevel(i)}>
+              {lvl.name}
+            </button>
+          ))}
+          <div className="instructions">
+            <h3>Controls</h3>
+            <p>← Left Arrow: Move Left</p>
+            <p>→ Right Arrow: Move Right</p>
+            <p>↑ Up Arrow or Space: Jump</p>
           </div>
-        )}
+        </div>
+      ) : (
+        <div className="game-layout">
+          <div
+            className="game-board"
+            style={{ backgroundImage: `url(${levels[currentLevelIndex].background})` }}
+          >
+            <Player x={playerX - scrollX} y={playerY} img={duckImg} />
+            {platforms.map((plat, i) => (
+              <Platform
+                key={i}
+                left={plat.left - scrollX}
+                bottom={plat.bottom}
+                width={plat.width}
+              />
+            ))}
+            {enemies.map((enemy, i) => (
+              <Enemy
+                key={i}
+                left={enemy.left - scrollX}
+                bottom={enemy.bottom}
+                width={enemy.width}
+                height={enemy.height}
+                img={bigfootImg}
+              />
+            ))}
+            {prize && (
+              <img
+                src={watermelonImg}
+                alt="Watermelon Prize"
+                style={{
+                  position: "absolute",
+                  left: prize.left - scrollX,
+                  bottom: prize.bottom,
+                  width: prize.width,
+                  height: prize.height,
+                  zIndex: 3,
+                  userSelect: "none",
+                  pointerEvents: "none",
+                }}
+              />
+            )}
 
-        {hikeAccomplished && (
-          <div className="game-over">
-            <h1>Hike accomplished!</h1>
-            <button onClick={restartGame}>Play Again</button>
+            {(gameOver || hikeAccomplished) && (
+              <div className="game-over">
+                <h1>{gameOver ? "Game Over" : "Hike Accomplished!"}</h1>
+                {gameOver ? (
+                  <button onClick={restartGame}>Restart</button>
+                ) : (
+                  <>
+                    <button onClick={restartGame}>Replay Level</button>
+                    <button
+                      onClick={() => {
+                        if (currentLevelIndex < levels.length - 1) {
+                          startTransitionToLevel(currentLevelIndex + 1);
+                        }
+                      }}
+                      disabled={currentLevelIndex >= levels.length - 1}
+                    >
+                      Next Level
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+
+            {isTransitioning && (
+              <div
+                className="screen-wipe expand"
+                onAnimationEnd={handleOverlayAnimationEnd}
+              />
+            )}
           </div>
-        )}
-      </div>
 
-      <div className="score">Score: {score}</div>
+          <div className="side-panel">
+            <div className="instructions">
+              <h3>Keyboard Controls</h3>
+              <p>← Left Arrow: Move Left</p>
+              <p>→ Right Arrow: Move Right</p>
+              <p>↑ Up Arrow or Space: Jump</p>
+            </div>
+            <div className="instructions">
+              <h3>Mouse Controls</h3>
+            </div>
+            <div className="controls">
+              <div className="horizontal-buttons">
+                <button onClick={() => setVelocityX((vx) => Math.max(vx - MOVE_ACCELERATION, -MAX_SPEED))}>
+                  Left
+                </button>
+                <button onClick={() => setVelocityX((vx) => Math.min(vx + MOVE_ACCELERATION, MAX_SPEED))}>
+                  Right
+                </button>
+              </div>
+              <button
+                onClick={() => {
+                  if (!isJumping) {
+                    setVelocityY(JUMP_VELOCITY);
+                    setIsJumping(true);
+                  }
+                }}
+              >
+                Jump
+              </button>
+            </div>
 
-      <div className="controls">
-        <button
-          onClick={() => {
-            setPlayerX((x) => {
-              const newX = Math.max(x - 10, 0);
-              setScrollX((s) =>
-                newX < viewportWidth / 2
-                  ? Math.max(newX - viewportWidth / 2, 0)
-                  : s
-              );
-              return newX;
-            });
-          }}
-        >
-          Left
-        </button>
-        <button onClick={jump}>Jump</button>
-        <button
-          onClick={() => {
-            setPlayerX((x) => {
-              const newX = Math.min(x + 10, maxGameWidth);
-              setScrollX((s) =>
-                newX > viewportWidth / 2
-                  ? Math.min(newX - viewportWidth / 2, maxGameWidth - viewportWidth)
-                  : 0
-              );
-              return newX;
-            });
-          }}
-        >
-          Right
-        </button>
-      </div>
+            {/* Restart level button */}
+            <button onClick={restartGame}>Restart Level</button>
 
-      <div style={{ marginTop: "20px" }}>
-        <button
-          onClick={restartGame}
-          style={{
-            padding: "12px 24px",
-            fontSize: "18px",
-            backgroundColor: "#ff4d4d",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            transition: "background 0.3s ease",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#cc3a3a")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#ff4d4d")}
-        >
-          Restart Game
-        </button>
-      </div>
+            <button onClick={() => setCurrentScreen("menu")}>Back to Menu</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 export default App;
-
-/* import logo from './logo.svg';
-import './App.css';
-
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
-
-export default App;
-*/

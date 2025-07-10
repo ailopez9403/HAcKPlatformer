@@ -1,16 +1,19 @@
 import React from "react";
+import platformImg from "./Platform_Image.png"; // adjust the path if needed
 
 function Platform({ left, bottom, width }) {
   return (
     <div
-      className="platform"
       style={{
         position: "absolute",
-        left: `${left}px`,
-        bottom: `${bottom}px`,
-        width: `${width}px`,
-        height: "20px",
-        backgroundColor: "green"
+        left,
+        bottom,
+        width,
+        height: 20,
+        backgroundImage: `url(${platformImg})`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        zIndex: 2,
       }}
     />
   );
