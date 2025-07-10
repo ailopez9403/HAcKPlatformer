@@ -23,9 +23,12 @@ function App() {
   const [isJumping, setIsJumping] = useState(false);
   const [scrollX, setScrollX] = useState(0);
   const [gameOver, setGameOver] = useState(false);
-  const [hikeAccomplished, setHikeAccomplished] = useState(false);
+  const [levelComplete, setLevelComplete] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [nextLevelToLoad, setNextLevelToLoad] = useState(null);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [elapsedTime, setElapsedTime] = useState(0);
+  const [leaderboard, setLeaderboard] = useState({});
 
   const GRAVITY = -0.3;
   const JUMP_VELOCITY = 12;
@@ -39,7 +42,7 @@ function App() {
 
   const levels = useMemo(() => [
     {
-      name: "Daytime",
+      name: "Level 1",
       background: bgDay,
       platforms: [
         { left: 0, bottom: 0, width: 300 },
@@ -57,13 +60,13 @@ function App() {
       ],
       enemies: [
         { left: 400, bottom: 60, width: 50, height: 60 },
-        { left: 900, bottom: 300, width: 50, height: 60 },
-        { left: 1600, bottom: 560, width: 50, height: 60 },
+        { left: 1000, bottom: 300, width: 50, height: 60 },
+        { left: 1550, bottom: 560, width: 50, height: 60 },
       ],
       prize: { left: 2050, bottom: 540, width: 60, height: 60 },
     },
     {
-      name: "Night",
+      name: "Level 2",
       background: bgNight,
       platforms: [
         { left: 0, bottom: 0, width: 400 },
@@ -76,42 +79,43 @@ function App() {
         { left: 1800, bottom: 500, width: 160 },
       ],
       enemies: [
-        { left: 700, bottom: 170, width: 50, height: 60 },
-        { left: 1300, bottom: 380, width: 50, height: 60 },
-        { left: 1900, bottom: 510, width: 50, height: 60 },
+        { left: 650, bottom: 170, width: 50, height: 60 },
+        { left: 1250, bottom: 390, width: 50, height: 60 },
+        { left: 1500, bottom: 420, width: 50, height: 60 },
+        { left: 1850, bottom: 520, width: 50, height: 60 },
       ],
       prize: { left: 2050, bottom: 500, width: 60, height: 60 },
     },
     {
-      name: "Dusk",
+      name: "Level 3",
       background: bgDusk,
       platforms: [
         { left: 0, bottom: 0, width: 300 },
         { left: 400, bottom: 100, width: 100 },
         { left: 600, bottom: 200, width: 120 },
         { left: 800, bottom: 300, width: 100 },
-        { left: 1000, bottom: 400, width: 80 },
+        { left: 1000, bottom: 400, width: 150 },
         { left: 1200, bottom: 500, width: 80 },
         { left: 1400, bottom: 450, width: 80 },
         { left: 1600, bottom: 350, width: 80 },
         { left: 1950, bottom: 320, width: 100 },
       ],
       enemies: [
-        { left: 500, bottom: 120, width: 50, height: 60 },
+        { left: 450, bottom: 120, width: 50, height: 60 },
         { left: 850, bottom: 320, width: 50, height: 60 },
-        { left: 1100, bottom: 420, width: 50, height: 60 },
-        { left: 1300, bottom: 520, width: 50, height: 60 },
-        { left: 1700, bottom: 360, width: 50, height: 60 },
+        { left: 1000, bottom: 420, width: 50, height: 60 },
+        { left: 1200, bottom: 520, width: 50, height: 60 },
+        { left: 1600, bottom: 370, width: 50, height: 60 },
       ],
       prize: { left: 2050, bottom: 320, width: 60, height: 60 },
     },
   ], []);
 
-  const loadLevel = useCallback((index) => {
-    const level = levels[index];
-    setCurrentLevelIndex(index);
+  // New helper function to reset game state without affecting the timer
+  const resetGameState = useCallback(() => {
+    const level = levels[currentLevelIndex]; // Load current level's data
     setPlatforms(level.platforms);
-    setEnemies(level.enemies);
+    setEnemies(level.enemies.map(enemy => ({ ...enemy, direction: 1 })));
     setPrize(level.prize);
     setPlayerX(50);
     setPlayerY(100);
@@ -120,8 +124,29 @@ function App() {
     setIsJumping(false);
     setScrollX(0);
     setGameOver(false);
-    setHikeAccomplished(false);
+    setLevelComplete(false);
+    // Do NOT touch timer state here
+  }, [currentLevelIndex, levels]); // Added currentLevelIndex to dependency array
+
+  const loadLevel = useCallback((index) => {
+    const level = levels[index];
+    setCurrentLevelIndex(index);
+    setPlatforms(level.platforms);
+    setEnemies(level.enemies.map(enemy => ({ ...enemy, direction: 1 })));
+    setPrize(level.prize);
+    setPlayerX(50);
+    setPlayerY(100);
+    setVelocityX(0);
+    setVelocityY(0);
+    setIsJumping(false);
+    setScrollX(0);
+    setGameOver(false);
+    setLevelComplete(false);
     setCurrentScreen("game");
+    // Reset timer when a new level is explicitly loaded (from menu or next level)
+    setElapsedTime(0);
+    setTimerRunning(false); // Also stop the timer until player explicitly starts it
+    setIsTransitioning(false); // <--- Make sure transition state is false when a level is loaded
   }, [levels]);
 
   const startTransitionToLevel = (index) => {
@@ -136,6 +161,10 @@ function App() {
         setNextLevelToLoad(null);
         e.target.classList.remove("expand");
         e.target.classList.add("contract");
+      } else {
+        // If the wipe expanded but there's no next level to load (e.g., going back to menu)
+        // Ensure the transition state is cleared so the screen can become interactive again.
+        setIsTransitioning(false);
       }
     } else if (e.animationName === "wipeContract") {
       setIsTransitioning(false);
@@ -144,15 +173,24 @@ function App() {
   };
 
   useEffect(() => {
-    if (currentScreen !== "game" || gameOver || hikeAccomplished) return;
+    if (timerRunning) {
+      const interval = setInterval(() => {
+        setElapsedTime((time) => time + 10);
+      }, 10);
+      return () => clearInterval(interval);
+    }
+  }, [timerRunning]);
+
+  useEffect(() => {
+    if (currentScreen !== "game" || gameOver || levelComplete) return;
 
     const interval = setInterval(() => {
       setVelocityY((vy) => vy + GRAVITY);
 
       setPlayerY((prevY) => {
         const nextY = prevY + velocityY;
-        const playerBottomNext = nextY;
         const playerBottomPrev = prevY;
+        const playerBottomNext = nextY;
         const playerLeft = playerX;
         const playerRight = playerX + playerWidth;
 
@@ -186,6 +224,7 @@ function App() {
 
         if (!landed && nextY < 0) {
           setGameOver(true);
+          setTimerRunning(false); // This stops timer on game over
           return prevY;
         }
 
@@ -201,6 +240,34 @@ function App() {
         }
 
         setVelocityX(newVX);
+
+        setEnemies((prevEnemies) =>
+          prevEnemies.map((enemy) => {
+            const platform = platforms.find(
+              (plat) =>
+                enemy.bottom === plat.bottom + 20 &&
+                enemy.left >= plat.left &&
+                enemy.left + enemy.width <= plat.left + plat.width
+            );
+            if (!platform) return enemy;
+
+            let newLeft = enemy.left + (enemy.direction || 1) * 0.2;
+
+            if (newLeft <= platform.left) {
+              newLeft = platform.left;
+              enemy.direction = 1;
+            } else if (newLeft + enemy.width >= platform.left + platform.width) {
+              newLeft = platform.left + platform.width - enemy.width;
+              enemy.direction = -1;
+            }
+
+            return {
+              ...enemy,
+              left: newLeft,
+              direction: enemy.direction,
+            };
+          })
+        );
 
         const newX = Math.min(Math.max(0, prevX + newVX), maxGameWidth);
         setScrollX(
@@ -219,25 +286,31 @@ function App() {
     playerX,
     playerY,
     gameOver,
-    hikeAccomplished,
+    levelComplete,
     platforms,
     isJumping,
     GRAVITY,
     currentScreen,
   ]);
 
-  const handleKeyDown = useCallback((event) => {
-    if (currentScreen !== "game" || gameOver || hikeAccomplished) return;
+  const handleKeyDown = useCallback(
+    (event) => {
+      if (currentScreen !== "game" || gameOver || levelComplete) return;
 
-    if (event.code === "ArrowLeft") {
-      setVelocityX((vx) => Math.max(vx - MOVE_ACCELERATION, -MAX_SPEED));
-    } else if (event.code === "ArrowRight") {
-      setVelocityX((vx) => Math.min(vx + MOVE_ACCELERATION, MAX_SPEED));
-    } else if ((event.code === "Space" || event.code === "ArrowUp") && !isJumping) {
-      setVelocityY(JUMP_VELOCITY);
-      setIsJumping(true);
-    }
-  }, [currentScreen, gameOver, hikeAccomplished, isJumping]);
+      if (event.code === "ArrowLeft") {
+        setVelocityX((vx) => Math.max(vx - MOVE_ACCELERATION, -MAX_SPEED));
+      } else if (event.code === "ArrowRight") {
+        setVelocityX((vx) => Math.min(vx + MOVE_ACCELERATION, MAX_SPEED));
+      } else if (
+        (event.code === "Space" || event.code === "ArrowUp") &&
+        !isJumping
+      ) {
+        setVelocityY(JUMP_VELOCITY);
+        setIsJumping(true);
+      }
+    },
+    [currentScreen, gameOver, levelComplete, isJumping]
+  );
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -245,7 +318,7 @@ function App() {
   }, [handleKeyDown]);
 
   useEffect(() => {
-    if (currentScreen !== "game" || gameOver || hikeAccomplished) return;
+    if (currentScreen !== "game" || gameOver || levelComplete) return;
 
     const playerRect = {
       left: playerX,
@@ -273,6 +346,7 @@ function App() {
         )
       ) {
         setGameOver(true);
+        setTimerRunning(false); // This stops timer on game over
         return;
       }
     }
@@ -286,30 +360,88 @@ function App() {
         playerRect.bottom + playerRect.height < prize.bottom
       )
     ) {
-      setHikeAccomplished(true);
+      setLevelComplete(true);
+      setTimerRunning(false); // Stop timer on level completion
+      setLeaderboard((prev) => {
+        const levelName = levels[currentLevelIndex].name;
+        const currentBest = prev[levelName] ?? Infinity;
+        if (elapsedTime < currentBest) {
+          const updated = { ...prev, [levelName]: elapsedTime };
+          localStorage.setItem("leaderboard", JSON.stringify(updated));
+          return updated;
+        }
+        return prev;
+      });
     }
-  }, [playerX, playerY, enemies, prize, gameOver, hikeAccomplished, currentScreen]);
+  }, [playerX, playerY, enemies, prize, gameOver, levelComplete, currentScreen, elapsedTime, currentLevelIndex, levels]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("leaderboard");
+    if (saved) setLeaderboard(JSON.parse(saved));
+  }, []);
 
   const restartGame = () => {
-    loadLevel(currentLevelIndex);
+    // Call the new helper function to reset game state without affecting timer
+    resetGameState();
+    setTimerRunning(true); // Ensure timer starts running again after restart
+  };
+
+  const formatTime = (ms) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const hundredths = Math.floor((ms % 1000) / 10);
+    return `${minutes.toString().padStart(2, "0")}:${seconds
+      .toString()
+      .padStart(2, "0")}.${hundredths.toString().padStart(2, "0")}`;
+  };
+
+  const resetLeaderboard = () => {
+    localStorage.removeItem("leaderboard");
+    setLeaderboard({});
+  };
+
+  // Dedicated function for going back to menu
+  const handleBackToMenu = () => {
+    setCurrentScreen("menu");
+    // Crucially, reset transition state here when going back to menu directly
+    setIsTransitioning(false);
+    setNextLevelToLoad(null); // Also clear any pending next level
   };
 
   return (
     <div className="App">
       {currentScreen === "menu" ? (
         <div className="menu-screen">
-          <h1>Platformer Game</h1>
+          <h1>Duck, Duck, Squatch</h1>
           <h2>Select a Level</h2>
           {levels.map((lvl, i) => (
             <button key={i} onClick={() => loadLevel(i)}>
               {lvl.name}
             </button>
           ))}
+
+          <div className="leaderboard">
+            <h3>Leaderboard (Fastest Level Times)</h3>
+            {(() => {
+              const entries = Object.entries(leaderboard).map(([levelName, time]) => ({ levelName, time }));
+              entries.sort((a, b) => a.time - b.time);
+              const top3 = entries.slice(0, 3);
+              if (top3.length === 0) {
+                return <p>No records yet</p>;
+              }
+              return top3.map(({ levelName, time }, index) => (
+                <p key={levelName}>
+                  {levelName}: {formatTime(time)}
+                </p>
+              ));
+            })()}
+            <button onClick={resetLeaderboard}>Reset Leaderboard</button>
+          </div>
+
           <div className="instructions">
-            <h3>Controls</h3>
-            <p>← Left Arrow: Move Left</p>
-            <p>→ Right Arrow: Move Right</p>
-            <p>↑ Up Arrow or Space: Jump</p>
+            <h3>Instructions</h3>
+            <p>Avoid all the sasquatches for a prize at the end!</p>
           </div>
         </div>
       ) : (
@@ -354,9 +486,9 @@ function App() {
               />
             )}
 
-            {(gameOver || hikeAccomplished) && (
+            {(gameOver || levelComplete) && (
               <div className="game-over">
-                <h1>{gameOver ? "Game Over" : "Hike Accomplished!"}</h1>
+                <h1>{gameOver ? "Game Over" : "Level Complete!"}</h1>
                 {gameOver ? (
                   <button onClick={restartGame}>Restart</button>
                 ) : (
@@ -377,12 +509,23 @@ function App() {
               </div>
             )}
 
-            {isTransitioning && (
+            {/* Render screen wipe only if isTransitioning is true AND currentScreen is 'game' or 'transition' if you had one */}
+            {/* The problem might be if isTransitioning is true and currentScreen is 'menu' */}
+            {isTransitioning && currentScreen !== 'menu' && (
               <div
                 className="screen-wipe expand"
                 onAnimationEnd={handleOverlayAnimationEnd}
               />
             )}
+
+            <div className="timer-display">
+              <h3>Timer: {formatTime(elapsedTime)}</h3>
+              {!timerRunning ? (
+                <button onClick={() => setTimerRunning(true)}>Start Timer</button>
+              ) : (
+                <button onClick={() => setTimerRunning(false)}>Stop Timer</button>
+              )}
+            </div>
           </div>
 
           <div className="side-panel">
@@ -397,10 +540,18 @@ function App() {
             </div>
             <div className="controls">
               <div className="horizontal-buttons">
-                <button onClick={() => setVelocityX((vx) => Math.max(vx - MOVE_ACCELERATION, -MAX_SPEED))}>
+                <button
+                  onClick={() =>
+                    setVelocityX((vx) => Math.max(vx - MOVE_ACCELERATION, -MAX_SPEED))
+                  }
+                >
                   Left
                 </button>
-                <button onClick={() => setVelocityX((vx) => Math.min(vx + MOVE_ACCELERATION, MAX_SPEED))}>
+                <button
+                  onClick={() =>
+                    setVelocityX((vx) => Math.min(vx + MOVE_ACCELERATION, MAX_SPEED))
+                  }
+                >
                   Right
                 </button>
               </div>
@@ -416,10 +567,9 @@ function App() {
               </button>
             </div>
 
-            {/* Restart level button */}
             <button onClick={restartGame}>Restart Level</button>
 
-            <button onClick={() => setCurrentScreen("menu")}>Back to Menu</button>
+            <button onClick={handleBackToMenu}>Back to Menu</button>
           </div>
         </div>
       )}

@@ -29,6 +29,18 @@
   cursor: pointer;
 }
 
+.leaderboard {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.leaderboard button {
+  margin-top: 10px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 .instructions {
   margin-top: 20px;
   font-size: 14px;
@@ -36,8 +48,8 @@
 
 .game-layout {
   display: flex;
-  width: 98vw;      /* Almost full viewport width */
-  height: 95vh;     /* Almost full viewport height */
+  width: 98vw;
+  height: 95vh;
   margin: auto;
   border: 2px solid black;
   box-sizing: border-box;
@@ -46,7 +58,7 @@
 
 .game-board {
   position: relative;
-  width: 72%;      /* Bigger game board */
+  width: 72%;
   height: 100%;
   background-size: cover;
   background-position: center;
@@ -55,7 +67,7 @@
 }
 
 .side-panel {
-  width: 28%;      /* Side panel takes rest */
+  width: 28%;
   height: 100%;
   padding: 20px;
   background: #f0f0f0;
@@ -67,15 +79,15 @@
 
 .controls {
   display: flex;
-  flex-direction: column;  /* Stack children vertically */
-  align-items: center;     /* Center buttons horizontally */
+  flex-direction: column;
+  align-items: center;
   margin-top: 20px;
 }
 
 .horizontal-buttons {
   display: flex;
-  justify-content: center;  /* Center buttons */
-  gap: 5px;                 /* Small gap between buttons */
+  justify-content: center;
+  gap: 5px;
   margin-bottom: 10px;
 }
 
@@ -141,4 +153,30 @@
   100% {
     transform: translateX(100%);
   }
+}
+
+.timer-display {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.85);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  z-index: 15;
+  display: flex; /* Added for button layout */
+  flex-direction: column; /* Added for button layout */
+  align-items: flex-end; /* Align items to the right */
+}
+
+.timer-controls { /* New style for the timer buttons container */
+  display: flex;
+  gap: 5px; /* Space between buttons */
+  margin-top: 8px;
+}
+
+.timer-controls button {
+  font-size: 14px;
+  padding: 6px 10px;
+  cursor: pointer;
 }
