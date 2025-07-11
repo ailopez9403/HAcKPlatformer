@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useRef,useState, useEffect, useCallback, useMemo } from "react";
 import Player from "./utilities/Player.js";
 import Platform from "./utilities/Platform.js";
 import Enemy from "./utilities/Enemy.js";
@@ -8,6 +8,10 @@ import bigfootImg from "./static/images/bigfoot.png";
 import levels from "./utilities/levels.js";
 import BackgroundMusic from "./utilities/BackgroundMusic.js";
 import menuMusic from "./static/audio/mainMenu.mp3";
+import quackSound from './static/audio/duck.mp3'; 
+import deadSound from './static/audio/glitch-scream.mp3';
+import dropSound from './static/audio/death.wav';
+import SoundEffect from "./utilities/soundEffect.js";
 import "./static/styles/App.css";
 
 
@@ -31,6 +35,11 @@ function App() {
   const [timerRunning, setTimerRunning] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [leaderboard, setLeaderboard] = useState({});
+  
+  //References for sound effects
+  const soundRef = useRef();
+  const deathRef = useRef();
+  const fallRef = useRef();
 
   const GRAVITY = -0.3;
   const JUMP_VELOCITY = 12;
@@ -155,6 +164,7 @@ function App() {
         });
 
         if (!landed && nextY < 0) {
+          fallRef.current?.play();
           setGameOver(true);
           setTimerRunning(false); // This stops timer on game over
           return prevY;
@@ -227,8 +237,8 @@ function App() {
 
   const handleKeyDown = useCallback(
     (event) => {
-      if (currentScreen !== "game" || gameOver || levelComplete) return;
-
+      if (currentScreen !== "game" || gameOver || levelComplete) 
+        return;
       if (event.code === "ArrowLeft") {
         setVelocityX((vx) => Math.max(vx - MOVE_ACCELERATION, -MAX_SPEED));
       } else if (event.code === "ArrowRight") {
@@ -237,6 +247,7 @@ function App() {
         (event.code === "Space" || event.code === "ArrowUp") &&
         !isJumping
       ) {
+        soundRef.current?.play();
         setVelocityY(JUMP_VELOCITY);
         setIsJumping(true);
       }
@@ -277,6 +288,7 @@ function App() {
           playerRect.bottom + playerRect.height < enemyRect.bottom
         )
       ) {
+        deathRef.current?.play();
         setGameOver(true);
         setTimerRunning(false); // This stops timer on game over
         return;
@@ -383,6 +395,9 @@ function App() {
             className="game-board"
             style={{ backgroundImage: `url(${levels[currentLevelIndex].background})` }}
           >
+            <SoundEffect ref={soundRef} bg={quackSound} />
+            <SoundEffect ref={deathRef} bg={deadSound} />
+            <SoundEffect ref={fallRef} bg={dropSound} />
             <BackgroundMusic bg={levels[currentLevelIndex].music}/>
             <Player x={playerX - scrollX} y={playerY} img={duckImg} />
             {platforms.map((plat, i) => (
