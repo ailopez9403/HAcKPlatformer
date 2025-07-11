@@ -5,8 +5,8 @@ import Enemy from "./Enemy";
 import watermelonImg from "./static/images/prize.png";
 import duckImg from "./static/images/Duck_Character.png";
 import bigfootImg from "./static/images/bigfoot.png";
-import levels from "./levels.js";
-import "./App.css";
+import levels from "./utilities/levels.js";
+import "./static/styles/App.css";
 
 
 function App() {
