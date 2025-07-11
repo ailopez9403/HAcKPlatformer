@@ -8,6 +8,12 @@ import bigfootImg from "./bigfoot.png";
 import bgDay from "./daytime.jpg";
 import bgNight from "./night-time.jpg";
 import bgDusk from "./dawn.jpg";
+
+import samPhoto from "./SamuelZhang_Foto.jpg";
+import alexPhoto from "./AlexLopezPhoto.jpg";
+import yiskaPhoto from "./yiska.jpg";
+
+
 import "./App.css";
 
 function App() {
@@ -298,19 +304,95 @@ function App() {
     <div className="App">
       {currentScreen === "menu" ? (
         <div className="menu-screen">
-          <h1>Platformer Game</h1>
+          <h1>The Ducktastic Hike</h1>
           <h2>Select a Level</h2>
           {levels.map((lvl, i) => (
             <button key={i} onClick={() => loadLevel(i)}>
               {lvl.name}
             </button>
           ))}
+
+          <button onClick={() => setCurrentScreen("about")}>About the Creators</button>
           <div className="instructions">
             <h3>Controls</h3>
             <p>← Left Arrow: Move Left</p>
             <p>→ Right Arrow: Move Right</p>
             <p>↑ Up Arrow or Space: Jump</p>
           </div>
+        </div>
+      ) : currentScreen === "about" ? (
+        <div className="about-screen" style={{ padding: "20px", textAlign: "center" }}>
+          <h1>Meet the Creators</h1>
+
+          <div className="creator-profile" style={{ marginTop: "30px", display: "flex", alignItems: "center", gap: "20px", justifyContent: "center" }}>
+            <img src={samPhoto} alt="Samuel Zhang" style={{ width: "120px", height: "auto", borderRadius: "8px" }}/>
+        <div style={{ textAlign: "left", maxWidth: "500px" }}>
+    <h2 style={{ fontSize: "18px" }}>Samuel Zhang</h2>
+    <p>
+      Hello everyone! I'm majoring in mechanical engineering. 
+      In the future, I envision myself working in robotics. 
+      I love playing basketball and am a huge LeBron Fan!
+    </p>
+    <a
+      href="https://www.linkedin.com/in/zhangsamuell/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      LinkedIn Profile
+    </a>
+  </div>
+</div>
+
+
+          <div className="creator-profile" style={{ marginTop: "30px", display: "flex", alignItems: "center", gap: "20px", justifyContent: "center" }}>
+            <img src={alexPhoto} alt="Alex Lopez" style={{ width: "120px", height: "auto", borderRadius: "8px" }}/>
+        <div style={{ textAlign: "left", maxWidth: "500px" }}>
+    <h2 style={{ fontSize: "18px" }}>Alex Lopez</h2>
+    <p>
+      Hello everyone! I'm majoring in mechanical engineering. 
+      I plan on earning a Master's Degree or PhD in Engineering. 
+      Fun fact, I'm a huge Dodgers Fan!
+    </p>
+    <a
+      href="https://www.linkedin.com/in/alexlopez1159/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      LinkedIn Profile
+    </a>
+  </div>
+</div>
+
+          <div className="creator-profile" style={{ marginTop: "30px", display: "flex", alignItems: "center", gap: "20px", justifyContent: "center" }}>
+  <img
+    src={yiskaPhoto}
+    alt="Yiska Anastasia"
+    style={{ width: "120px", height: "auto", borderRadius: "8px" }}
+  />
+  <div style={{ textAlign: "left", maxWidth: "500px" }}>
+    <h2 style={{ fontSize: "18px" }}>Yiska Anastasia</h2>
+    <p>
+      Hello everyone! My name is Yiska and I'm majoring in electrical engineering.
+      I want to work in the semiconductor field or gain a Master's Degree in
+      electrical engineering. In my free time, I enjoy hiking and crafting with my hands!
+    </p>
+    <a
+      href="https://www.linkedin.com/in/graciela-yiska-anastasia-489743320/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      LinkedIn Profile
+    </a>
+  </div>
+</div>
+
+
+          <button
+            onClick={() => setCurrentScreen("menu")}
+            style={{ marginTop: "40px", padding: "10px 20px", fontSize: "16px" }}
+          >
+            Back to Menu
+          </button>
         </div>
       ) : (
         <div className="game-layout">
