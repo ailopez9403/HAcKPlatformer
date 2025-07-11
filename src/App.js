@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+
+//Import images used for game design (ex: player, platform, prize)
 import Player from "./Player";
 import Platform from "./Platform";
 import Enemy from "./Enemy";
@@ -9,6 +11,7 @@ import bgDay from "./daytime.jpg";
 import bgNight from "./night-time.jpg";
 import bgDusk from "./dawn.jpg";
 
+//Import photos for creator bios
 import samPhoto from "./SamuelZhang_Foto.jpg";
 import alexPhoto from "./AlexLopezPhoto.jpg";
 import yiskaPhoto from "./yiska.jpg";
@@ -16,17 +19,22 @@ import yiskaPhoto from "./yiska.jpg";
 
 import "./App.css";
 
+
 function App() {
-  const [currentScreen, setCurrentScreen] = useState("menu");
-  const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
-  const [platforms, setPlatforms] = useState([]);
-  const [enemies, setEnemies] = useState([]);
-  const [prize, setPrize] = useState(null);
+  const [currentScreen, setCurrentScreen] = useState("menu"); //Controls which screen shown to user
+  const [currentLevelIndex, setCurrentLevelIndex] = useState(0); //Tracks current level
+  const [platforms, setPlatforms] = useState([]); //Stores platform data for current level
+  const [enemies, setEnemies] = useState([]); //Stores enemy data for current level
+  const [prize, setPrize] = useState(null); //Stores watermelon prize object
+  
+  //Code below determines player position and movement
   const [playerX, setPlayerX] = useState(50);
   const [playerY, setPlayerY] = useState(100);
   const [velocityX, setVelocityX] = useState(0);
   const [velocityY, setVelocityY] = useState(0);
   const [isJumping, setIsJumping] = useState(false);
+  
+  //Code below controls screen updates (ex: screen scrolling, prize check, and screen transitions)
   const [scrollX, setScrollX] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [hikeAccomplished, setHikeAccomplished] = useState(false);
@@ -300,11 +308,14 @@ function App() {
     loadLevel(currentLevelIndex);
   };
 
+  //Defines what user interface will look when currentScreen state is set to main menu. ChatGPT was used to help set up initial layout.
   return (
     <div className="App">
       {currentScreen === "menu" ? (
         <div className="menu-screen">
           <h1>The Ducktastic Hike</h1>
+          
+          //Blocks of code below represent buttons that are available to be pressed to access other screen windows
           <h2>Select a Level</h2>
           {levels.map((lvl, i) => (
             <button key={i} onClick={() => loadLevel(i)}>
@@ -320,7 +331,8 @@ function App() {
             <p>↑ Up Arrow or Space: Jump</p>
           </div>
         </div>
-      ) : currentScreen === "about" ? (
+
+      ) : currentScreen === "about" ? ( //Start of about creators section. ChatGPT helped without inital layout but everything else manually designed.
         <div className="about-screen" style={{ padding: "20px", textAlign: "center" }}>
           <h1>Meet the Creators</h1>
 
