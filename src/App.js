@@ -6,7 +6,10 @@ import watermelonImg from "./static/images/prize.png";
 import duckImg from "./static/images/Duck_Character.png";
 import bigfootImg from "./static/images/bigfoot.png";
 import levels from "./utilities/levels.js";
+import BackgroundMusic from "./utilities/BackgroundMusic.js";
+import menuMusic from "./static/audio/mainMenu.mp3";
 import "./static/styles/App.css";
+
 
 
 function App() {
@@ -342,6 +345,7 @@ function App() {
     <div className="App">
       {currentScreen === "menu" ? (
         <div className="menu-screen">
+          <BackgroundMusic bg={menuMusic}/>
           <h1>Duck, Duck, Squatch</h1>
           <h2>Select a Level</h2>
           {levels.map((lvl, i) => (
@@ -379,6 +383,7 @@ function App() {
             className="game-board"
             style={{ backgroundImage: `url(${levels[currentLevelIndex].background})` }}
           >
+            <BackgroundMusic bg={levels[currentLevelIndex].music}/>
             <Player x={playerX - scrollX} y={playerY} img={duckImg} />
             {platforms.map((plat, i) => (
               <Platform

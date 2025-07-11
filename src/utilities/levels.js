@@ -1,8 +1,12 @@
 
- import bgDay from "../static/images/daytime.jpg";
- import bgNight from "../static/images/night-time.jpg";
- import bgDusk from "../static/images/dawn.jpg";
+import bgDay from "../static/images/daytime.jpg";
+import bgNight from "../static/images/night-time.jpg";
+import bgDusk from "../static/images/dawn.jpg";
+import l1 from "../static/audio/brightSong.mp3";
+import l2 from "../static/audio/lev2.mp3";
+import l3 from "../static/audio/lev3.mp3";
 
+ 
 
  const levels = [
     {
@@ -28,6 +32,8 @@
         { left: 1550, bottom: 560, width: 50, height: 60 },
       ],
       prize: { left: 2050, bottom: 540, width: 60, height: 60 },
+
+      music: l1,
     },
     {
       name: "Level 2",
@@ -49,6 +55,8 @@
         { left: 1850, bottom: 520, width: 50, height: 60 },
       ],
       prize: { left: 2050, bottom: 500, width: 60, height: 60 },
+
+      music:l2,
     },
     {
       name: "Level 3",
@@ -72,6 +80,7 @@
         { left: 1600, bottom: 370, width: 50, height: 60 },
       ],
       prize: { left: 2050, bottom: 320, width: 60, height: 60 },
+      music:l3,
     },
   ];
 
