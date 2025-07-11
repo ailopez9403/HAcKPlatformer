@@ -1,7 +1,7 @@
 
- import bgDay from "./daytime.jpg";
- import bgNight from "./night-time.jpg";
- import bgDusk from "./dawn.jpg";
+ import bgDay from "./static/images/daytime.jpg";
+ import bgNight from "./static/images/night-time.jpg";
+ import bgDusk from "./static/images/dawn.jpg";
 
 
  const levels = [
