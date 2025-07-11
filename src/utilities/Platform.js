@@ -1,5 +1,5 @@
 
-import platformImg from "./static/images/Platform_Image.png"; // adjust the path if needed
+import platformImg from "../static/images/Platform_Image.png"; // adjust the path if needed
 
 function Platform({ left, bottom, width }) {
   return (

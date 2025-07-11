@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import Player from "./Player";
-import Platform from "./Platform";
-import Enemy from "./Enemy";
+import Player from "./utilities/Player.js";
+import Platform from "./utilities/Platform.js";
+import Enemy from "./utilities/Enemy.js";
 import watermelonImg from "./static/images/prize.png";
 import duckImg from "./static/images/Duck_Character.png";
 import bigfootImg from "./static/images/bigfoot.png";

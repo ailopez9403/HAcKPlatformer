@@ -1,5 +1,5 @@
 
-import bigfootImg from "./static/images/bigfoot.png"; // adjust path if needed
+import bigfootImg from "../static/images/bigfoot.png"; // adjust path if needed
 
 function Enemy({ left, bottom, width, height }) {
   return (

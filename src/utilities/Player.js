@@ -1,5 +1,5 @@
 
-import duckImage from "./static/images/Duck_Character.png"; // adjust the path if needed
+import duckImage from "../static/images/Duck_Character.png"; // adjust the path if needed
 
 function Player({ x, y }) {
   return (
