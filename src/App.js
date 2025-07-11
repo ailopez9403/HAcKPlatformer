@@ -86,7 +86,7 @@ function App() {
     setCurrentScreen("game");
     // Reset timer when a new level is explicitly loaded (from menu or next level)
     setElapsedTime(0);
-    setTimerRunning(false); // Also stop the timer until player explicitly starts it
+    setTimerRunning(true); //Restarts timer in new level
     setIsTransitioning(false); // <--- Make sure transition state is false when a level is loaded
   }, [levels]);
 
