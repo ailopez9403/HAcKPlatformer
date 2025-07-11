@@ -252,17 +252,17 @@ function App() {
     const playerRect = {
       left: playerX,
       bottom: playerY,
-      width: playerWidth,
+      width: playerWidth-15,
       height: playerHeight,
     };
 
-    const hitboxPadding = 10;
+    const hitboxPadding = 0;
 
     for (const enemy of enemies) {
       const enemyRect = {
         left: enemy.left + hitboxPadding,
         bottom: enemy.bottom + hitboxPadding,
-        width: enemy.width - 2 * hitboxPadding,
+        width: (enemy.width - 2 * hitboxPadding) - 10,
         height: enemy.height - 2 * hitboxPadding,
       };
 
