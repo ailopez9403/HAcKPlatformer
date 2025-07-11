@@ -1,5 +1,10 @@
+.pixel-font {
+  font-family: 'PixelGame', sans-serif;
+}
+
+
 .App {
-  font-family: Arial, sans-serif;
+  font-family: 'PixelGame', sans-serif;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -25,32 +30,37 @@
   background-position: center center;
   height: 100vh; /* full screen */
   width: 100%;
+  font-size: 34px;
 
 }
 
 .menu-screen button {
+  font-family: 'PixelGame', sans-serif;
   display: block;
   margin: 12px auto;
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 26px;
   cursor: pointer;
 }
 
 .leaderboard {
+  font-family: 'PixelGame', sans-serif;
   margin-top: 20px;
-  font-size: 14px;
+  font-size: 24px;
 }
 
 .leaderboard button {
+  font-family: 'PixelGame', sans-serif;
   margin-top: 10px;
   padding: 6px 12px;
-  font-size: 14px;
+  font-size: 24px;
   cursor: pointer;
 }
 
 .instructions {
+  font-family: 'PixelGame', sans-serif;
   margin-top: 20px;
-  font-size: 14px;
+  font-size: 24px;
 }
 
 .game-layout {
@@ -101,12 +111,14 @@
 .horizontal-buttons button,
 .controls button,
 .side-panel button {
+  font-family: 'PixelGame', sans-serif;
   padding: 10px;
-  font-size: 14px;
+  font-size: 24px;
   cursor: pointer;
 }
 
 .game-over {
+  font-family: 'PixelGame', sans-serif;
   position: absolute;
   top: 30%;
   left: 50%;
@@ -120,9 +132,10 @@
 }
 
 .game-over button {
+  font-family: 'PixelGame', sans-serif;
   margin-top: 15px;
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 26px;
   cursor: pointer;
 }
 
@@ -163,6 +176,8 @@
 }
 
 .timer-display {
+  font-family: 'PixelGame', sans-serif;
+  font-size: 24px;
   position: absolute;
   top: 10px;
   right: 10px;
@@ -174,16 +189,19 @@
   display: flex; /* Added for button layout */
   flex-direction: column; /* Added for button layout */
   align-items: flex-end; /* Align items to the right */
+
 }
 
 .timer-controls { /* New style for the timer buttons container */
+  font-family: 'PixelGame', sans-serif;
   display: flex;
   gap: 5px; /* Space between buttons */
   margin-top: 8px;
 }
 
 .timer-controls button {
-  font-size: 14px;
+  font-family: 'PixelGame', sans-serif;
+  font-size: 24px;
   padding: 6px 10px;
   cursor: pointer;
 }
