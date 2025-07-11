@@ -180,7 +180,7 @@ function App() {
             );
             if (!platform) return enemy;
 
-            let newLeft = enemy.left + (enemy.direction || 1) * 0.2;
+            let newLeft = enemy.left + (enemy.direction || 1) * 0.7;
 
             if (newLeft <= platform.left) {
               newLeft = platform.left;
