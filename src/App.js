@@ -1,5 +1,5 @@
 //Import images used for game design (ex: player, platform, prize)
-import React, { useRef,useState, useEffect, useCallback, useMemo } from "react";
+import React, { useRef,useState, useEffect, useCallback } from "react";
 import Player from "./utilities/Player.js";
 import Platform from "./utilities/Platform.js";
 import Enemy from "./utilities/Enemy.js";
@@ -19,8 +19,6 @@ import "./static/styles/App.css";
 import samPhoto from "./SamuelZhang_Foto.jpg";
 import alexPhoto from "./AlexLopezPhoto.jpg";
 import yiskaPhoto from "./yiska.jpg";
-
-import "./App.css";
 
 
 function App() {
@@ -365,12 +363,13 @@ function App() {
   };
 
   //Defines what user interface will look when currentScreen state is set to main menu. ChatGPT was used to help set up initial layout.
+  ////Blocks of code below represent buttons that are available to be pressed to access other screen windows
   return (
     <div className="App">
       {currentScreen === "menu" ? (
         <div className="menu-screen">
 
-=======   //Blocks of code below represent buttons that are available to be pressed to access other screen windows
+=======
           <BackgroundMusic bg={menuMusic}/>
           <h1>Duck, Duck, Squatch</h1>
           <h2>Select a Level</h2>
