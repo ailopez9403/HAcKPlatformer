@@ -2,7 +2,7 @@
   font-family: 'PixelGame', sans-serif;
 }
 
-
+/*Sets up style for background*/
 .App {
   font-family: 'PixelGame', sans-serif;
   height: 100vh;
@@ -16,12 +16,13 @@
   box-sizing: border-box;
 }
 
+/*Sets menu background with duck gif*/
 .menu-screen {
   width: 400px;
   margin: 40px auto;
   text-align: center;
   background: white;
-  padding: 20px;
+  padding: 60px;
   border-radius: 8px;
   box-shadow: 0 0 8px rgba(0,0,0,0.2);
   background-image: url('../images/ducksAll.gif'); /* or imported path */
@@ -31,9 +32,9 @@
   height: 100vh; /* full screen */
   width: 100%;
   font-size: 34px;
-
 }
 
+/*Sets menu button with imported fonts*/
 .menu-screen button {
   font-family: 'PixelGame', sans-serif;
   display: block;
@@ -43,6 +44,7 @@
   cursor: pointer;
 }
 
+/*Sets menu button with imported fonts*/
 .leaderboard {
   font-family: 'PixelGame', sans-serif;
   margin-top: 20px;

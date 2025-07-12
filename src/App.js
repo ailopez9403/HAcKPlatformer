@@ -104,7 +104,7 @@ function App() {
   resetGameState if the currentLevelIndex changes or if the data in levels changes instead of re-creating the function
   every time the player restarts the Level.
   */
-  //Assited by ChatGPT
+  //Assisted by ChatGPT
   const resetGameState = useCallback(() => {
     const level = levels[currentLevelIndex]; // Load current level's data
     setPlatforms(level.platforms);
