@@ -1,0 +1,226 @@
+.pixel-font {
+  font-family: 'PixelGame', sans-serif;
+}
+
+/*Sets up style for background*/
+.App {
+  font-family: 'PixelGame', sans-serif;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #e5e5e5;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/*Sets menu background with duck gif*/
+.menu-screen {
+  width: 400px;
+  margin: 40px auto;
+  text-align: center;
+  background: white;
+  padding: 60px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.2);
+  background-image: url('../images/ducksAll.gif'); /* or imported path */
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  height: 100vh; /* full screen */
+  width: 100%;
+  font-size: 34px;
+}
+
+/*Sets button with imported fonts*/
+.menu-screen button {
+  font-family: 'PixelGame', sans-serif;
+  display: block;
+  margin: 12px auto;
+  padding: 10px 20px;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+/*Sets menu button with imported fonts*/
+.leaderboard {
+  font-family: 'PixelGame', sans-serif;
+  margin-top: 20px;
+  font-size: 24px;
+}
+
+/*Sets leaderboard button with imported fonts*/
+.leaderboard button {
+  font-family: 'PixelGame', sans-serif;
+  margin-top: 10px;
+  padding: 6px 12px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/*Sets instruction header*/
+.instructions {
+  font-family: 'PixelGame', sans-serif;
+  margin-top: 20px;
+  font-size: 24px;
+}
+
+/*Sets game layout*/
+.game-layout {
+  display: flex;
+  width: 98vw;
+  height: 95vh;
+  margin: auto;
+  border: 2px solid black;
+  box-sizing: border-box;
+  background: white;
+}
+
+/*Sets game window background and its border */
+.game-board {
+  position: relative;
+  width: 72%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+  border-right: 2px solid black;
+}
+
+/*Sets side panel menu background*/
+.side-panel {
+  width: 28%;
+  height: 100%;
+  padding: 20px;
+  background: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+/*Sets controls on the side panel*/
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+}
+
+/*Sets horizontal button on the side panel*/
+.horizontal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+/*Sets buttons and controls on the side panel*/
+.horizontal-buttons button,
+.controls button,
+.side-panel button {
+  font-family: 'PixelGame', sans-serif;
+  padding: 10px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/*Game over overlay*/
+.game-over {
+  font-family: 'PixelGame', sans-serif;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.85);
+  color: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  text-align: center;
+  z-index: 10;
+}
+
+/*Game over button*/
+.game-over button {
+  font-family: 'PixelGame', sans-serif;
+  margin-top: 15px;
+  padding: 10px 20px;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+/*Screen-wipe color*/
+.screen-wipe {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: black;
+  z-index: 20;
+}
+
+/*Screen-wipe expand*/
+.screen-wipe.expand {
+  animation: wipeExpand 0.7s forwards;
+}
+
+/*Screen-wipe contract*/
+.screen-wipe.contract {
+  animation: wipeContract 0.7s forwards;
+}
+
+/*Animation*/
+@keyframes wipeExpand {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes wipeContract {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/*Timer window*/
+.timer-display {
+  font-family: 'PixelGame', sans-serif;
+  font-size: 24px;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255,255,255,0.85);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: bold;
+  z-index: 15;
+  display: flex; /* Added for button layout */
+  flex-direction: column; /* Added for button layout */
+  align-items: flex-end; /* Align items to the right */
+
+}
+
+/*Timer controls background/window style  */
+.timer-controls { 
+  font-family: 'PixelGame', sans-serif;
+  display: flex;
+  gap: 5px; /* Space between buttons */
+  margin-top: 8px;
+}
+
+/*Timer controls button style*/
+.timer-controls button {
+  font-family: 'PixelGame', sans-serif;
+  font-size: 24px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
