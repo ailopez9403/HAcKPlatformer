@@ -51,6 +51,7 @@
   font-size: 24px;
 }
 
+/*Sets leaderboard button with imported fonts*/
 .leaderboard button {
   font-family: 'PixelGame', sans-serif;
   margin-top: 10px;
@@ -59,12 +60,14 @@
   cursor: pointer;
 }
 
+/*Sets instruction header*/
 .instructions {
   font-family: 'PixelGame', sans-serif;
   margin-top: 20px;
   font-size: 24px;
 }
 
+/*Sets game layout*/
 .game-layout {
   display: flex;
   width: 98vw;
@@ -75,6 +78,7 @@
   background: white;
 }
 
+/*Sets game window background and its border */
 .game-board {
   position: relative;
   width: 72%;
@@ -85,6 +89,7 @@
   border-right: 2px solid black;
 }
 
+/*Sets side panel menu background*/
 .side-panel {
   width: 28%;
   height: 100%;
@@ -96,6 +101,7 @@
   box-sizing: border-box;
 }
 
+/*Sets controls on the side panel*/
 .controls {
   display: flex;
   flex-direction: column;
@@ -103,6 +109,7 @@
   margin-top: 20px;
 }
 
+/*Sets horizontal button on the side panel*/
 .horizontal-buttons {
   display: flex;
   justify-content: center;
@@ -110,6 +117,7 @@
   margin-bottom: 10px;
 }
 
+/*Sets buttons and controls on the side panel*/
 .horizontal-buttons button,
 .controls button,
 .side-panel button {
@@ -119,6 +127,7 @@
   cursor: pointer;
 }
 
+/*Game over overlay*/
 .game-over {
   font-family: 'PixelGame', sans-serif;
   position: absolute;
@@ -133,6 +142,7 @@
   z-index: 10;
 }
 
+/*Game over button*/
 .game-over button {
   font-family: 'PixelGame', sans-serif;
   margin-top: 15px;
@@ -141,6 +151,7 @@
   cursor: pointer;
 }
 
+/*Screen-wipe color*/
 .screen-wipe {
   position: absolute;
   width: 100%;
@@ -151,14 +162,17 @@
   z-index: 20;
 }
 
+/*Screen-wipe expand*/
 .screen-wipe.expand {
   animation: wipeExpand 0.7s forwards;
 }
 
+/*Screen-wipe contract*/
 .screen-wipe.contract {
   animation: wipeContract 0.7s forwards;
 }
 
+/*Animation*/
 @keyframes wipeExpand {
   0% {
     transform: translateX(-100%);
@@ -177,6 +191,7 @@
   }
 }
 
+/*Timer window*/
 .timer-display {
   font-family: 'PixelGame', sans-serif;
   font-size: 24px;
@@ -194,13 +209,15 @@
 
 }
 
-.timer-controls { /* New style for the timer buttons container */
+/*Timer controls background/window style  */
+.timer-controls { 
   font-family: 'PixelGame', sans-serif;
   display: flex;
   gap: 5px; /* Space between buttons */
   margin-top: 8px;
 }
 
+/*Timer controls button style*/
 .timer-controls button {
   font-family: 'PixelGame', sans-serif;
   font-size: 24px;
