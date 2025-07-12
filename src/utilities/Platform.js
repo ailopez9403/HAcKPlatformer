@@ -1,6 +1,7 @@
+//Import the image used as the texture for all platforms
+import platformImg from "../static/images/Platform_Image.png";
 
-import platformImg from "../static/images/Platform_Image.png"; // adjust the path if needed
-
+//Define the Platform component, whose props are position and width
 function Platform({ left, bottom, width }) {
   return (
     <div
@@ -9,8 +10,8 @@ function Platform({ left, bottom, width }) {
         left,
         bottom,
         width,
-        height: 20,
-        backgroundImage: `url(${platformImg})`,
+        height: 20, 
+        backgroundImage: `url(${platformImg})`, //Set the background to the imported platform image
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
         zIndex: 2,
@@ -20,3 +21,4 @@ function Platform({ left, bottom, width }) {
 }
 
 export default Platform;
+
