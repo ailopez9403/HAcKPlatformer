@@ -16,6 +16,7 @@ function BackgroundMusic({bg}) {
     }
   }, [bg]);
 
+  //Loops bg music for the main menu and in-game
   return (
     <audio ref={audioRef} loop autoPlay>
       <source src={bg} type="audio/mpeg" />
