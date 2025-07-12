@@ -503,16 +503,16 @@ function App() {
   };
 
   //Defines what user interface will look when currentScreen state is set to main menu. ChatGPT was used to help set up initial layout.
-  ////Blocks of code below represent buttons that are available to be pressed to access other screen windows
+  //Blocks of code below represent buttons that are available to be pressed to access other screen windows
   return (
     <div className="App">
-      {currentScreen === "menu" ? (
+      {currentScreen === "menu" ? ( 
         <div className="menu-screen">
 
 =======
           <BackgroundMusic bg={menuMusic}/>
           <h1>Duck, Duck, Squatch</h1>
-          <h2>Select a Level</h2>
+          <h2>Select a Level</h2> 
           {levels.map((lvl, i) => (
             <button key={i} onClick={() => loadLevel(i)}>
               {lvl.name}
@@ -544,7 +544,12 @@ function App() {
           </div>
         </div>
 
-      ) : currentScreen === "about" ? ( //Start of about creators section. ChatGPT helped without inital layout but everything else manually designed.
+      /*Start of "About the Creators" section. When currentScreen state variable is switched to "about" section, new screen pops up detailing the 
+        profiles of all three creators (Samuel, Alex, and Yiska). All text references font defined in .App of App.css to match the other menu options. 
+        Each creator profile presents a name, picture, short bio and LinkedIn link. ChatGPT assisted with inital layout but everything else was manually 
+        designed to fit on page.
+      */
+      ) : currentScreen === "about" ? (
         <div className="about-screen" style={{ padding: "20px", textAlign: "center" }}>
           <h1>Meet the Creators</h1>
 
