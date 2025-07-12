@@ -34,7 +34,7 @@
   font-size: 34px;
 }
 
-/*Sets menu button with imported fonts*/
+/*Sets button with imported fonts*/
 .menu-screen button {
   font-family: 'PixelGame', sans-serif;
   display: block;
